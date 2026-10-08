@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>AMPT — Agricultural Market Price Tracker</title>
+</head>
+<body>
+    <h1>Agricultural Market Price Tracker</h1>
+    <p>Local setup is working — MVC, service wiring, JPA and the DB connection are all live.</p>
+    <ul>
+        <li>Markets seeded: <span th:text="${marketCount}">0</span></li>
+        <li>Commodities seeded: <span th:text="${commodityCount}">0</span></li>
+        <li>Price records: <span th:text="${recordCount}">0</span></li>
+    </ul>
+    <p><em>Search, summary indicators, drill-down and alerts views land in Task 5/6.</em></p>
+</body>
+</html>
