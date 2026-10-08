@@ -1,0 +1,23 @@
+flowchart TB
+    Farmer((Farmer / Buyer))
+    Trader((Trader / Mandi Official))
+
+    subgraph AMPT["Agricultural Market Price Tracker (AMPT)"]
+        UC1[Search Price Records]
+        UC2[View Dashboard Summary]
+        UC3[Drill Down into Records]
+        UC4[View Alerts & Exceptions]
+        UC5[Enter Price Record]
+        UC6[Edit Price Record]
+    end
+
+    Farmer --> UC1
+    Farmer --> UC2
+    Farmer --> UC3
+    Farmer --> UC4
+    Trader --> UC1
+    Trader --> UC2
+    Trader --> UC3
+    Trader --> UC4
+    Trader --> UC5
+    Trader --> UC6

@@ -1,44 +1,53 @@
-# AMPT — Local Setup
+# Agricultural Market Price Tracker (AMPT)
 
-Spring Boot 3 / Java 21 / Maven / H2 (local) / MySQL (profile) / WAR-deployable to Tomcat.
+CI/CD Pipeline and Application for an Agricultural Market Price Tracker.
+
+**Tech Stack**: Java 21, Spring Boot 3.3.4, Spring MVC, Spring Data JPA, Thymeleaf, H2 (local) / MySQL (profile), Maven, WAR packaging deployable to Tomcat.
+
+---
 
 ## Prerequisites
-- JDK 21
-- Maven 3.9+
+- JDK 21 (configured in `JAVA_HOME` and `PATH`)
+- Apache Maven 3.9+
+- Git
 
-## Run locally (embedded Tomcat, H2 file DB)
+---
+
+## How to Build & Run Locally
+
+### 1. Build the Package & Run Tests
+```bash
+mvn clean package
+```
+- Compiles the application source code.
+- Runs JUnit 5 test suite (`AmptApplicationTests`).
+- Produces `target/ampt.war` (both standalone runnable and deployable to external Tomcat).
+
+### 2. Start the Local Server
 ```bash
 mvn spring-boot:run
 ```
-Then open http://localhost:8080/ — the dashboard page confirms the DB connection and
-shows seeded market/commodity counts.
+- Starts embedded Tomcat on **Port `8082`** (customized to prevent conflicts with Jenkins on `8080` and standalone Tomcat on `8081`).
+- Mounts H2 file database at `./data/amptdb` and seeds initial market & commodity data.
 
-H2 console (optional, for inspecting data): http://localhost:8080/h2-console
-(JDBC URL: `jdbc:h2:file:./data/amptdb`, user `sa`, empty password)
+### 3. Access in Browser
+- **AMPT Dashboard**: [http://localhost:8082/](http://localhost:8082/)
+- **Actuator Health Check**: [http://localhost:8082/actuator/health](http://localhost:8082/actuator/health)
+- **H2 Database Web Console**: [http://localhost:8082/h2-console](http://localhost:8082/h2-console)
+  - JDBC URL: `jdbc:h2:file:./data/amptdb`
+  - User: `sa`
+  - Password: *(leave blank)*
 
-## Build a deployable WAR (for Tomcat — Task 8)
-```bash
-mvn clean package
-# -> target/ampt.war
-```
-Copy `target/ampt.war` into a standalone Tomcat's `webapps/` directory, or let the
-Task 8 Jenkins pipeline do it automatically.
+---
 
-## Run with MySQL profile (used from Task 11 onward)
+## Running with MySQL Profile (for Docker / CI Environments)
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=mysql \
   -DDB_URL=jdbc:mysql://localhost:3306/amptdb -DDB_USER=ampt -DDB_PASSWORD=ampt
 ```
 
-## Run tests
-```bash
-mvn test
-```
+---
 
-## Health check
-http://localhost:8080/actuator/health — used by the Ansible health-check step in Task 14.
-
-> Note: this skeleton was authored and reviewed for correctness in an environment
-> without Maven/internet access to execute an actual build. Before Task 4 (repo
-> push) / Task 5, run `mvn clean package` locally once to confirm a clean build —
-> the code uses only standard, current Spring Boot 3.3.x APIs.
+## Documentation
+- [Task 3 Architecture & SRS](file:///docs/03-architecture.md)
+- [Evidence Logs & HTTP Dumps](file:///docs/evidence/task03/)

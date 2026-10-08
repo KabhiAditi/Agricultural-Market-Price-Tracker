@@ -1,0 +1,39 @@
+erDiagram
+    MARKET ||--o{ PRICE_RECORD : "reports"
+    COMMODITY ||--o{ PRICE_RECORD : "priced"
+    APP_USER ||--o{ PRICE_RECORD : "enters"
+
+    MARKET {
+        bigint id PK "Primary Key"
+        string name "Market Name"
+        string district "District"
+        string state "State"
+    }
+
+    COMMODITY {
+        bigint id PK "Primary Key"
+        string name "Commodity Name (Unique)"
+        string unit "Unit (e.g. quintal, kg)"
+    }
+
+    APP_USER {
+        bigint id PK "Primary Key"
+        string username "Unique Username"
+        string password_hash "Encrypted Password"
+        string role "ENTRY_USER or VIEWER"
+    }
+
+    PRICE_RECORD {
+        bigint id PK "Primary Key"
+        bigint market_id FK "References MARKET(id)"
+        bigint commodity_id FK "References COMMODITY(id)"
+        date record_date "Record Date"
+        decimal min_price "Minimum Price"
+        decimal max_price "Maximum Price"
+        decimal modal_price "Modal / Prevailing Price"
+        decimal arrival_qty "Arrival Quantity"
+        boolean is_alert "Alert Flag"
+        bigint created_by FK "References APP_USER(id)"
+        datetime created_at "Timestamp Created"
+        datetime updated_at "Timestamp Updated"
+    }

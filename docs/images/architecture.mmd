@@ -1,0 +1,26 @@
+flowchart LR
+    subgraph Presentation["Presentation Tier (Client & Web)"]
+        Browser["Web Browser (User)"]
+        Thymeleaf["Thymeleaf Template Engine"]
+        Controllers["Spring MVC Controllers<br/>(HomeController, PriceController)"]
+    end
+
+    subgraph Business["Business & Service Tier"]
+        Services["Service Layer<br/>(PriceAggregationService, AlertService)"]
+        Security["Spring Security / Role Authorization<br/>(ENTRY_USER, VIEWER)"]
+    end
+
+    subgraph DataTier["Data & Persistence Tier"]
+        Repositories["Spring Data JPA Repositories<br/>(Market, Commodity, PriceRecord, AppUser)"]
+        Hibernate["Hibernate ORM Engine"]
+        Database[("Database<br/>(H2 File DB / MySQL)")]
+    end
+
+    Browser -->|HTTP GET/POST| Controllers
+    Controllers --> Thymeleaf
+    Thymeleaf -->|HTML Response| Browser
+    Controllers --> Security
+    Security --> Services
+    Services --> Repositories
+    Repositories --> Hibernate
+    Hibernate -->|JDBC SQL Queries| Database
