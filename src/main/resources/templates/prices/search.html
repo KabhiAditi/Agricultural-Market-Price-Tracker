@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Price Search & Directory — AMPT</title>
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --alert-bg: #fef2f2;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+        }
+        .page-title p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .filter-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px 100px;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .filter-group select, .filter-group input {
+            padding: 0.55rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            background: #fff;
+        }
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.15);
+        }
+        .btn {
+            padding: 0.6rem 1.1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        .btn-sm {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.825rem;
+        }
+        .table-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        thead {
+            background-color: #f8fafc;
+            border-bottom: 2px solid var(--border);
+        }
+        th {
+            padding: 0.85rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+        }
+        td {
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background-color: #fdfdfd;
+        }
+        .modal-price-cell {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        .badge {
+            background: #f1f5f9;
+            color: #334155;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.775rem;
+            font-weight: 600;
+        }
+        .badge-user {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-viewer {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: #fafbfc;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        .pagination-nav {
+            display: flex;
+            gap: 0.35rem;
+        }
+        .page-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .page-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+        .page-btn.disabled {
+            color: #cbd5e1;
+            pointer-events: none;
+            background: #f8fafc;
+        }
+        .alert-flash {
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .alert-success {
+            background: var(--success-bg);
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+        }
+        .alert-danger {
+            background: var(--alert-bg);
+            border: 1px solid #fecaca;
+            color: var(--danger);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a class="navbar-brand" th:href="@{/}">🌾 AMPT</a>
+        <nav class="nav-links">
+            <a th:href="@{/}">Dashboard</a>
+            <a th:href="@{/prices}" style="color: var(--primary); font-weight: 600;">Search Prices</a>
+            <a th:href="@{/prices/new}">+ New Price</a>
+            <span th:if="${session.currentUser != null}">
+                <span class="badge" th:classappend="${session.currentUser.role.name() == 'ENTRY_USER'} ? 'badge-user' : 'badge-viewer'"
+                      th:text="${session.currentUser.username + ' (' + session.currentUser.role + ')'}">user</span>
+                <a th:href="@{/logout}" style="margin-left: 0.5rem; color: var(--text-muted);">Logout</a>
+            </span>
+            <span th:if="${session.currentUser == null}">
+                <a th:href="@{/login}">Login</a>
+            </span>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert-flash alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert-flash alert-danger" th:text="${errorMessage}"></div>
+
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Agricultural Price Directory</h1>
+                <p>Filter, search, and analyze daily arrivals and modal price discoveries across APMC mandis.</p>
+            </div>
+            <div>
+                <a class="btn btn-primary" th:href="@{/prices/new}">+ Add Price Record</a>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar (B06, B07) -->
+        <div class="filter-card">
+            <form th:action="@{/prices}" method="get">
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="marketId">Market Mandi</label>
+                        <select id="marketId" name="marketId">
+                            <option value="">All Markets</option>
+                            <option th:each="m : ${markets}" th:value="${m.id}" th:text="${m.name}"
+                                    th:selected="${selectedMarketId != null && selectedMarketId == m.id}"></option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="commodityId">Commodity</label>
+                        <select id="commodityId" name="commodityId">
+                            <option value="">All Commodities</option>
+                            <option th:each="c : ${commodities}" th:value="${c.id}" th:text="${c.name}"
+                                    th:selected="${selectedCommodityId != null && selectedCommodityId == c.id}"></option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="from">From Date</label>
+                        <input type="date" id="from" name="from" th:value="${from}"/>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="to">To Date</label>
+                        <input type="date" id="to" name="to" th:value="${to}"/>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="sortBy">Sort By</label>
+                        <select id="sortBy" name="sortBy">
+                            <option value="recordDate" th:selected="${sortBy == 'recordDate'}">Date</option>
+                            <option value="modalPrice" th:selected="${sortBy == 'modalPrice'}">Modal Price</option>
+                            <option value="arrivalQty" th:selected="${sortBy == 'arrivalQty'}">Arrival Qty</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="sortDir">Order</label>
+                        <select id="sortDir" name="sortDir">
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Desc ↓</option>
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Asc ↑</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Filter</button>
+                    </div>
+
+                    <div>
+                        <a th:href="@{/prices}" class="btn btn-secondary" style="width: 100%;">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Price Records Table (B07) -->
+        <div class="table-card">
+            <div th:if="${records.empty}" class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3>No Price Records Found</h3>
+                <p>No agricultural market price data matches your active filter criteria. Try adjusting your date range or filters.</p>
+                <a th:href="@{/prices}" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">Clear Filters</a>
+            </div>
+
+            <table th:if="${!records.empty}">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Market Mandi</th>
+                        <th>Commodity</th>
+                        <th>Arrival (Qtl)</th>
+                        <th>Min Price (₹)</th>
+                        <th>Modal Price (₹)</th>
+                        <th>Max Price (₹)</th>
+                        <th>Entered By</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${records.content}">
+                        <td th:text="${r.recordDate}">2026-10-10</td>
+                        <td>
+                            <strong th:text="${r.market.name}">Nagpur APMC</strong>
+                            <div style="font-size: 0.775rem; color: var(--text-muted);" th:text="${r.market.district + ', ' + r.market.state}">Maharashtra</div>
+                        </td>
+                        <td>
+                            <span class="badge" th:text="${r.commodity.name}">Tomato</span>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(r.arrivalQty, 1, 2)}">250.00</td>
+                        <td th:text="'₹' + ${#numbers.formatDecimal(r.minPrice, 1, 2)}">₹1,800.00</td>
+                        <td class="modal-price-cell" th:text="'₹' + ${#numbers.formatDecimal(r.modalPrice, 1, 2)}">₹2,150.00</td>
+                        <td th:text="'₹' + ${#numbers.formatDecimal(r.maxPrice, 1, 2)}">₹2,400.00</td>
+                        <td>
+                            <span th:if="${r.createdBy != null}" th:text="${r.createdBy.username}" style="font-size: 0.8rem; color: var(--text-muted);">entry</span>
+                            <span th:if="${r.createdBy == null}" style="color: #94a3b8; font-size: 0.8rem;">system</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a class="btn btn-secondary btn-sm" th:href="@{'/prices/' + ${r.id} + '/edit'}">Edit</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination (B07: 10 per page) -->
+            <div th:if="${!records.empty}" class="pagination-container">
+                <div>
+                    Showing <strong th:text="${currentPage * 10 + 1}">1</strong> to
+                    <strong th:text="${(currentPage + 1) * 10 > totalElements ? totalElements : (currentPage + 1) * 10}">10</strong>
+                    of <strong th:text="${totalElements}">126</strong> entries
+                </div>
+
+                <div class="pagination-nav" th:if="${totalPages > 1}">
+                    <a th:classappend="${currentPage == 0} ? 'disabled' : ''"
+                       th:href="@{/prices(marketId=${selectedMarketId}, commodityId=${selectedCommodityId}, from=${from}, to=${to}, sortBy=${sortBy}, sortDir=${sortDir}, page=${currentPage - 1})}"
+                       class="page-btn">← Prev</a>
+
+                    <span th:each="p : ${#numbers.sequence(0, totalPages - 1)}">
+                        <a th:if="${p >= currentPage - 2 && p <= currentPage + 2}"
+                           th:classappend="${p == currentPage} ? 'active' : ''"
+                           th:href="@{/prices(marketId=${selectedMarketId}, commodityId=${selectedCommodityId}, from=${from}, to=${to}, sortBy=${sortBy}, sortDir=${sortDir}, page=${p})}"
+                           class="page-btn" th:text="${p + 1}">1</a>
+                    </span>
+
+                    <a th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''"
+                       th:href="@{/prices(marketId=${selectedMarketId}, commodityId=${selectedCommodityId}, from=${from}, to=${to}, sortBy=${sortBy}, sortDir=${sortDir}, page=${currentPage + 1})}"
+                       class="page-btn">Next →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

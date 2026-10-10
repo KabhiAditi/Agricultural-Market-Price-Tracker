@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${isEdit ? 'Edit Price Record — AMPT' : 'New Price Record — AMPT'}">Price Form — AMPT</title>
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .container {
+            max-width: 760px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .card-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 1rem;
+        }
+        .card-header h1 {
+            font-size: 1.5rem;
+            margin: 0 0 0.25rem 0;
+            font-weight: 700;
+        }
+        .card-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.875rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-main);
+        }
+        input, select {
+            padding: 0.65rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+        }
+        .has-error {
+            border-color: var(--danger) !important;
+        }
+        .error-message {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.35rem;
+            font-weight: 500;
+        }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        .info-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            color: #166534;
+            margin-bottom: 1.5rem;
+        }
+        .badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a class="navbar-brand" th:href="@{/}">🌾 AMPT</a>
+        <nav class="nav-links">
+            <a th:href="@{/}">Dashboard</a>
+            <a th:href="@{/prices}">Search Prices</a>
+            <a th:href="@{/prices/new}" style="color: var(--primary); font-weight: 600;">+ New Price</a>
+            <span th:if="${session.currentUser != null}">
+                <span class="badge" th:text="${session.currentUser.username + ' (' + session.currentUser.role + ')'}">user</span>
+                <a th:href="@{/logout}" style="margin-left: 0.5rem; color: var(--text-muted);">Logout</a>
+            </span>
+            <span th:if="${session.currentUser == null}">
+                <a th:href="@{/login}">Login</a>
+            </span>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 th:text="${isEdit ? 'Edit Price Record #' + priceForm.id : 'Add New Daily Price Record'}">Price Entry</h1>
+                <p>Enter certified mandi arrival and price discovery figures with validation rules.</p>
+            </div>
+
+            <div class="info-box">
+                ℹ️ <strong>Validation Rules:</strong> Required fields must be non-empty, values must be strictly positive, and <strong>Modal Price</strong> must lie between the <strong>Minimum Price</strong> and <strong>Maximum Price</strong>.
+            </div>
+
+            <form th:action="${isEdit ? '/prices/' + priceForm.id : '/prices'}" th:object="${priceForm}" method="post">
+                <input type="hidden" th:if="${isEdit}" th:field="*{id}"/>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="marketId">Market (APMC Mandi) *</label>
+                        <select id="marketId" th:field="*{marketId}" th:classappend="${#fields.hasErrors('marketId')} ? 'has-error'">
+                            <option value="">-- Select Market --</option>
+                            <option th:each="m : ${markets}" th:value="${m.id}" th:text="${m.name + ' (' + m.district + ', ' + m.state + ')'}"></option>
+                        </select>
+                        <div class="error-message" th:if="${#fields.hasErrors('marketId')}" th:errors="*{marketId}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="commodityId">Commodity *</label>
+                        <select id="commodityId" th:field="*{commodityId}" th:classappend="${#fields.hasErrors('commodityId')} ? 'has-error'">
+                            <option value="">-- Select Commodity --</option>
+                            <option th:each="c : ${commodities}" th:value="${c.id}" th:text="${c.name + ' (' + c.unit + ')'}"></option>
+                        </select>
+                        <div class="error-message" th:if="${#fields.hasErrors('commodityId')}" th:errors="*{commodityId}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recordDate">Reporting Date *</label>
+                        <input type="date" id="recordDate" th:field="*{recordDate}" th:classappend="${#fields.hasErrors('recordDate')} ? 'has-error'"/>
+                        <div class="error-message" th:if="${#fields.hasErrors('recordDate')}" th:errors="*{recordDate}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="arrivalQty">Arrival Quantity (Quintals) *</label>
+                        <input type="number" step="0.01" min="0" id="arrivalQty" th:field="*{arrivalQty}" placeholder="e.g. 250.00" th:classappend="${#fields.hasErrors('arrivalQty')} ? 'has-error'"/>
+                        <div class="error-message" th:if="${#fields.hasErrors('arrivalQty')}" th:errors="*{arrivalQty}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minPrice">Minimum Price (₹/Quintal) *</label>
+                        <input type="number" step="0.01" min="0.01" id="minPrice" th:field="*{minPrice}" placeholder="e.g. 1800.00" th:classappend="${#fields.hasErrors('minPrice')} ? 'has-error'"/>
+                        <div class="error-message" th:if="${#fields.hasErrors('minPrice')}" th:errors="*{minPrice}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxPrice">Maximum Price (₹/Quintal) *</label>
+                        <input type="number" step="0.01" min="0.01" id="maxPrice" th:field="*{maxPrice}" placeholder="e.g. 2400.00" th:classappend="${#fields.hasErrors('maxPrice')} ? 'has-error'"/>
+                        <div class="error-message" th:if="${#fields.hasErrors('maxPrice')}" th:errors="*{maxPrice}"></div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="modalPrice">Modal Price (₹/Quintal) *</label>
+                        <input type="number" step="0.01" min="0.01" id="modalPrice" th:field="*{modalPrice}" placeholder="e.g. 2150.00 (most frequent trading price)" th:classappend="${#fields.hasErrors('modalPrice')} ? 'has-error'"/>
+                        <div class="error-message" th:if="${#fields.hasErrors('modalPrice')}" th:errors="*{modalPrice}"></div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a class="btn btn-secondary" th:href="@{/prices}">Cancel</a>
+                    <button type="submit" class="btn btn-primary" th:text="${isEdit ? 'Update Price Record' : 'Save Price Record'}">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
