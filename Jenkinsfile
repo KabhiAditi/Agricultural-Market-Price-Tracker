@@ -54,27 +54,28 @@ pipeline {
             }
         }
         
-        
-        
+        ```groovy
         stage('Health Check') {
             steps {
                 script {
-                    echo 'Waiting for Tomcat application to become ready...'
-                    sleep(time: 15, unit: 'SECONDS')
+                    echo 'Checking application health on Tomcat...'
 
-                    def statusCode = bat(
-                        script: '''
-                            @echo off
-                            curl.exe -s -o health-response.txt -w "%%{http_code}" http://localhost:8081/ampt/actuator/health
-                        ''',
-                        returnStdout: true
-                    ).trim()
+                    retry(6) {
+                        sleep(time: 10, unit: 'SECONDS')
 
-                    echo "Health Check HTTP Status: ${statusCode}"
+                        def statusCode = bat(
+                            script: '''
+                                @echo off
+                                curl.exe -s -o health-response.txt -w "%%{http_code}" http://localhost:8081/ampt/actuator/health
+                            ''',
+                            returnStdout: true
+                        ).trim()
 
-                    if (statusCode != '200') {
-                        bat 'type health-response.txt'
-                        error("Health check failed. HTTP status: ${statusCode}")
+                        echo "Health Check HTTP Status: ${statusCode}"
+
+                        if (statusCode != '200') {
+                            error("Application not ready yet. HTTP status: ${statusCode}")
+                        }
                     }
 
                     echo 'Application health check passed!'
@@ -82,8 +83,6 @@ pipeline {
                 }
             }
         }
-
-
 
     }
     
