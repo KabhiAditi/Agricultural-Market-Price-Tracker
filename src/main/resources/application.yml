@@ -22,6 +22,11 @@ management:
       exposure:
         include: health,info
 
+ampt:
+  alert:
+    threshold-percent: 15
+    cutoff-hour: 17
+
 ---
 spring:
   config:
