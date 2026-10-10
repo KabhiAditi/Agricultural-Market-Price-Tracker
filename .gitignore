@@ -1,22 +1,87 @@
-target/
+# ==========================================
+# Java / Compiled Class Files
+# ==========================================
 *.class
+*.war
+*.ear
+*.nar
 
-# Log files
-*.log
+# ==========================================
+# Maven Build Artifacts
+# ==========================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
 
-# H2 database files
+# ==========================================
+# Database & Local Runtime State
+# ==========================================
 data/
+*.db
+*.h2.db
+*.trace.db
 
-# IDE files
+# ==========================================
+# Log Files & Crash Dumps
+# ==========================================
+*.log
+logs/
+hs_err_pid*
+replay_pid*
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+# IntelliJ IDEA
 .idea/
 *.iml
+*.iws
+*.ipr
+out/
+
+# Visual Studio Code
 .vscode/
+*.code-workspace
+
+# Eclipse
 .settings/
 .classpath
 .project
+.factorypath
+.springBeans
 
-# OS / Temporary files
-Thumbs.db
-.DS_Store
+# ==========================================
+# Docker & Containers
+# ==========================================
+.docker/
+*.docker.log
+docker-compose.override.yml
+
+# ==========================================
+# Jenkins CI/CD Temp Files
+# ==========================================
+.jenkins/
+jenkins.war
+*.jenkins.log
+
+# ==========================================
+# Operating System & Office Temporary Files
+# ==========================================
+# MS Word / Office temporary and lock files
 ~$*
+~WRL*.tmp
 *.tmp
+*.temp
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store
+._*
+
