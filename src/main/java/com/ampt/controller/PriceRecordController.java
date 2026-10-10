@@ -44,6 +44,14 @@ public class PriceRecordController {
             @RequestParam(defaultValue = "desc") String sortDir,
             Model model) {
 
+        // Self-Review Fix: Handle inverted date filter gracefully
+        if (from != null && to != null && from.isAfter(to)) {
+            LocalDate temp = from;
+            from = to;
+            to = temp;
+            model.addAttribute("infoMessage", "Notice: Search date range was inverted and has been automatically ordered (" + from + " to " + to + ").");
+        }
+
         Sort sort = "asc".equalsIgnoreCase(sortDir) ?
                 Sort.by(sortBy).ascending() :
                 Sort.by(sortBy).descending();

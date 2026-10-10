@@ -61,6 +61,16 @@ public class PriceRecordService {
                         "Modal price cannot be greater than maximum price.");
             }
         }
+
+        // Self-Review Fix: If min equals max, modal must equal both
+        if (form.getMinPrice() != null && form.getMaxPrice() != null && form.getModalPrice() != null) {
+            if (form.getMinPrice().compareTo(form.getMaxPrice()) == 0) {
+                if (form.getModalPrice().compareTo(form.getMinPrice()) != 0) {
+                    bindingResult.rejectValue("modalPrice", "error.modalPrice",
+                            "When minimum price equals maximum price, modal price must equal both.");
+                }
+            }
+        }
     }
 
     public PriceRecord create(PriceRecordForm form, AppUser user) {

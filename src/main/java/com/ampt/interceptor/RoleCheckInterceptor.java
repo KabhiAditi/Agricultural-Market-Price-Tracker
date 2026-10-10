@@ -43,8 +43,9 @@ public class RoleCheckInterceptor implements HandlerInterceptor {
         }
 
         if (user.getRole() != Role.ENTRY_USER) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                    "Access Denied: Only ENTRY_USER role is authorized to create or edit price records.");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("Access Denied: Only ENTRY_USER role is authorized to create or edit price records.");
             return false;
         }
 

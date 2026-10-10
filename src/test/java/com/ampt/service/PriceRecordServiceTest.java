@@ -73,6 +73,34 @@ class PriceRecordServiceTest {
     }
 
     @Test
+    @DisplayName("Validation passes for uniform flat price where min == modal == max")
+    void testValidateForm_UniformFlatPrice() {
+        PriceRecordForm form = new PriceRecordForm();
+        form.setMinPrice(new BigDecimal("2000.00"));
+        form.setMaxPrice(new BigDecimal("2000.00"));
+        form.setModalPrice(new BigDecimal("2000.00"));
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(form, "priceForm");
+        priceRecordService.validateForm(form, bindingResult);
+
+        assertFalse(bindingResult.hasErrors());
+    }
+
+    @Test
+    @DisplayName("Validation fails when min == max but modal price differs")
+    void testValidateForm_UniformFlatPrice_ModalDiffers() {
+        PriceRecordForm form = new PriceRecordForm();
+        form.setMinPrice(new BigDecimal("2000.00"));
+        form.setMaxPrice(new BigDecimal("2000.00"));
+        form.setModalPrice(new BigDecimal("2050.00"));
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(form, "priceForm");
+        priceRecordService.validateForm(form, bindingResult);
+
+        assertTrue(bindingResult.hasFieldErrors("modalPrice"));
+    }
+
+    @Test
     @DisplayName("Validation fails when min price is greater than max price")
     void testValidateForm_MinGreaterThanMax() {
         PriceRecordForm form = new PriceRecordForm();
