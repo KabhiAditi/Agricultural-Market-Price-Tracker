@@ -1,0 +1,2 @@
+﻿origin	https://github.com/KabhiAditi/Agricultural-Market-Price-Tracker.git (fetch)
+origin	https://github.com/KabhiAditi/Agricultural-Market-Price-Tracker.git (push)
