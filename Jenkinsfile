@@ -9,11 +9,11 @@ pipeline {
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['dev', 'test', 'prod'], description: 'Target deployment environment')
         string(name: 'SERVER_PORT', defaultValue: '8080', description: 'Tomcat Server Port (Change if Tomcat is on 8081)')
-        string(name: 'DEPLOY_PATH', defaultValue: 'C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps', description: 'Path to Tomcat webapps directory')
+        string(name: 'DEPLOY_PATH', defaultValue: 'C:\\Program Files\\Apache Software Foundation\\Tomcat 11.0\\webapps', description: 'Path to Tomcat webapps directory')
     }
     
     environment {
-        APP_NAME = 'ampt/'
+        APP_NAME = 'ampt'
         APP_URL = "http://localhost:${params.SERVER_PORT}/${APP_NAME}"
     }
     
