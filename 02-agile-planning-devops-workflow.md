@@ -9,25 +9,25 @@ Baseline: `docs/01-problem-definition-scope.md` (15-task frozen MVP scope)
 
 Priority: **H**igh / **M**edium / **L**ow. Points on a 1–5 scale (1 = trivial, 5 = complex).
 
-| ID | Area | Backlog Item | Priority | Points |
-|----|------|--------------|----------|--------|
-| B01 | Foundation | Define data model (Market, Commodity, PriceRecord, User/Role) | H | 3 |
-| B02 | Foundation | Project skeleton, build tool config, local DB schema/migration | H | 3 |
-| B03 | Entry | Price-entry form (create) with validation | H | 3 |
-| B04 | Entry | Edit/correct existing price record (update) | H | 2 |
-| B05 | Entry | Role check — only authorized roles enter/edit | M | 2 |
-| B06 | Dashboard | Search API + UI (market, commodity, date range) | H | 4 |
-| B07 | Dashboard | Paginated, sortable results list | M | 2 |
-| B08 | Summary | Compute today's avg/modal price per commodity | H | 3 |
-| B09 | Summary | Compute % change vs previous reporting day | H | 3 |
-| B10 | Summary | Dashboard indicator widgets | M | 2 |
-| B11 | Drill-down | Click-through from indicator to record list | M | 2 |
-| B12 | Drill-down | Single-record / full-history detail view | M | 3 |
-| B13 | Alerts | Rule: flag price change beyond threshold | H | 3 |
-| B14 | Alerts | Rule: flag market missing today's data | M | 2 |
-| B15 | Alerts | Alerts/exceptions list view | M | 2 |
+| ID | Area | Backlog Item | Priority | Points | Status | Implemented Branch / Task |
+|----|------|--------------|----------|--------|--------|---------------------------|
+| B01 | Foundation | Define data model (Market, Commodity, PriceRecord, User/Role) | H | 3 | **Done** | `main` / Task 3 |
+| B02 | Foundation | Project skeleton, build tool config, local DB schema/migration | H | 3 | **Done** | `main` / Task 3 |
+| B03 | Entry | Price-entry form (create) with validation | H | 3 | **Done** | `feature/B03-price-entry` / Task 5 |
+| B04 | Entry | Edit/correct existing price record (update) | H | 2 | **Done** | `feature/B03-price-entry` / Task 5 |
+| B05 | Entry | Role check — only authorized roles enter/edit | M | 2 | **Done** | `feature/B03-price-entry` / Task 5 |
+| B06 | Dashboard | Search API + UI (market, commodity, date range) | H | 4 | **Done** | `feature/B03-price-entry` / Task 5 |
+| B07 | Dashboard | Paginated, sortable results list | M | 2 | **Done** | `feature/B03-price-entry` / Task 5 |
+| B08 | Summary | Compute today's avg/modal price per commodity | H | 3 | **Done** | `feature/B08-summary-indicators` / Task 6 |
+| B09 | Summary | Compute % change vs previous reporting day | H | 3 | **Done** | `feature/B08-summary-indicators` / Task 6 |
+| B10 | Summary | Dashboard indicator widgets | M | 2 | **Done** | `feature/B08-summary-indicators` / Task 6 |
+| B11 | Drill-down | Click-through from indicator to record list | M | 2 | **Done** | `feature/B08-summary-indicators` / Task 6 |
+| B12 | Drill-down | Single-record / full-history detail view | M | 3 | **Done** | `feature/B08-summary-indicators` / Task 6 |
+| B13 | Alerts | Rule: flag price change beyond threshold | H | 3 | **Done** | `feature/B13-alerts` / Task 6 |
+| B14 | Alerts | Rule: flag market missing today's data | M | 2 | **Done** | `feature/B13-alerts` / Task 6 |
+| B15 | Alerts | Alerts/exceptions list view | M | 2 | **Done** | `feature/B13-alerts` / Task 6 |
 
-**Total points: 39** (used only to size the single MVP sprint — see §4)
+**Total points: 39 (100% Completed / Done for MVP Release v1.0.0)**
 
 ---
 

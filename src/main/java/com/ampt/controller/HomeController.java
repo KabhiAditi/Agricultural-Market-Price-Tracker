@@ -18,13 +18,16 @@ public class HomeController {
     private final MarketRepository marketRepository;
     private final CommodityRepository commodityRepository;
     private final PriceRecordRepository priceRecordRepository;
+    private final com.ampt.service.SummaryService summaryService;
 
     public HomeController(MarketRepository marketRepository,
-                           CommodityRepository commodityRepository,
-                           PriceRecordRepository priceRecordRepository) {
+                          CommodityRepository commodityRepository,
+                          PriceRecordRepository priceRecordRepository,
+                          com.ampt.service.SummaryService summaryService) {
         this.marketRepository = marketRepository;
         this.commodityRepository = commodityRepository;
         this.priceRecordRepository = priceRecordRepository;
+        this.summaryService = summaryService;
     }
 
     @GetMapping("/")
@@ -32,6 +35,19 @@ public class HomeController {
         model.addAttribute("marketCount", marketRepository.count());
         model.addAttribute("commodityCount", commodityRepository.count());
         model.addAttribute("recordCount", priceRecordRepository.count());
+
+        // B08, B09, B10: Populate daily commodity indicators
+        var summaries = summaryService.getDailySummaries(null);
+        model.addAttribute("summaries", summaries);
+        if (!summaries.isEmpty()) {
+            model.addAttribute("reportingDate", summaries.get(0).getReportDate());
+        }
         return "dashboard";
+    }
+
+    @GetMapping("/dashboard/summary")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.List<com.ampt.dto.CommoditySummaryDto> getSummaryJson() {
+        return summaryService.getDailySummaries(null);
     }
 }

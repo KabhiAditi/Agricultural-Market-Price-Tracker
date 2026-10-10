@@ -2,16 +2,267 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>AMPT — Agricultural Market Price Tracker</title>
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+        .hero {
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.25);
+        }
+        .hero h1 {
+            font-size: 2.25rem;
+            margin: 0 0 0.75rem 0;
+            font-weight: 800;
+        }
+        .hero p {
+            font-size: 1.1rem;
+            margin: 0 0 1.5rem 0;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.15s;
+        }
+        .btn-light {
+            background: #ffffff;
+            color: var(--primary);
+        }
+        .btn-light:hover {
+            background: #f1f5f9;
+        }
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <h1>Agricultural Market Price Tracker</h1>
-    <p>Local setup is working — MVC, service wiring, JPA and the DB connection are all live.</p>
-    <ul>
-        <li>Markets seeded: <span th:text="${marketCount}">0</span></li>
-        <li>Commodities seeded: <span th:text="${commodityCount}">0</span></li>
-        <li>Price records: <span th:text="${recordCount}">0</span></li>
-    </ul>
-    <p><em>Search, summary indicators, drill-down and alerts views land in Task 5/6.</em></p>
+    <header class="navbar">
+        <a class="navbar-brand" th:href="@{/}">🌾 AMPT</a>
+        <nav class="nav-links">
+            <a th:href="@{/}" style="color: var(--primary); font-weight: 600;">Dashboard</a>
+            <a th:href="@{/prices}">Search Prices</a>
+            <a th:href="@{/prices/new}">+ New Price</a>
+            <a th:href="@{/alerts}" style="color: #dc2626; font-weight: 600;">⚠️ Alerts</a>
+            <span th:if="${session.currentUser != null}">
+                <span class="badge" th:text="${session.currentUser.username + ' (' + session.currentUser.role + ')'}">user</span>
+                <a th:href="@{/logout}" style="margin-left: 0.5rem; color: var(--text-muted);">Logout</a>
+            </span>
+            <span th:if="${session.currentUser == null}">
+                <a th:href="@{/login}">Login</a>
+            </span>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="hero">
+            <h1>Agricultural Market Price Tracker</h1>
+            <p>Empowering farmers and agricultural traders with real-time modal price discovery, daily mandi arrivals, and trend analysis.</p>
+            <div class="hero-actions">
+                <a class="btn btn-light" th:href="@{/prices}">Browse Price Directory →</a>
+                <a class="btn btn-outline" th:href="@{/prices/new}">+ Enter Today's Prices</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${marketCount}">3</div>
+                <div class="stat-label">Markets Reporting</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${commodityCount}">3</div>
+                <div class="stat-label">Commodities Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${recordCount}">126</div>
+                <div class="stat-label">Price Records Live</div>
+            </div>
+        </div>
+
+        <!-- B13-B15: Active Market Alerts & Exceptions Overview -->
+        <section style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.5rem; margin: 0; color: #dc2626;">⚠️ Market Exceptions & Volatility Alerts (B13-B15)</h2>
+                <a th:href="@{/alerts}" style="color: #dc2626; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                    Full Surveillance Dashboard →
+                </a>
+            </div>
+            <div style="background: white; border: 1px solid var(--border); border-left: 5px solid #dc2626; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">Real-Time Exception Detection Engine</span>
+                    <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700;">
+                        ACTIVE THRESHOLD: 15%
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); margin: 0 0 1rem 0; font-size: 0.95rem;">
+                    Surveillance engine automatically flags modal price movements exceeding &plusmn;15% day-over-day and alerts on mandis with missing filings after 17:00 IST cutoff.
+                </p>
+                <div style="display: flex; gap: 1rem;">
+                    <a th:href="@{/alerts}" style="padding: 0.5rem 1rem; background: #dc2626; color: white; border-radius: 6px; font-size: 0.875rem; font-weight: 600; text-decoration: none;">
+                        Review Active Alerts & Exceptions
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- B10: Summary Indicator Widgets & B11: Drill-down Links -->
+        <section style="margin-top: 2.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.5rem; margin: 0;">Today's Commodity Summary & Trends (B08-B10)</h2>
+                <span style="color: var(--text-muted); font-size: 0.9rem;" th:if="${reportingDate != null}">
+                    As of: <strong th:text="${reportingDate}">2026-10-10</strong>
+                </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <div th:each="s : ${summaries}" style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <h3 style="margin: 0; font-size: 1.25rem;" th:text="${s.commodityName}">Tomato</h3>
+                        <span style="background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;" th:text="${s.unit}">quintal</span>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" th:text="'₹' + ${s.avgPrice}">₹2,150.00</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Today's Avg Modal Price</div>
+                    </div>
+
+                    <!-- B09: % Change with no prior data handling -->
+                    <div style="padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; margin-bottom: 1.25rem; font-weight: 600;"
+                         th:styleappend="${!s.hasPriorData} ? 'background: #f8fafc; color: var(--text-muted);' : (${s.percentChange >= 0} ? 'background: #f0fdf4; color: #166534;' : 'background: #fef2f2; color: #dc2626;')">
+                        <span th:if="${s.hasPriorData}">
+                            <span th:text="${s.percentChange >= 0 ? '▲ +' : '▼ '} + ${s.percentChange} + '%'">+2.5%</span>
+                            vs previous day (₹<span th:text="${s.prevDayModalPrice}">2,100</span>)
+                        </span>
+                        <span th:if="${!s.hasPriorData}">
+                            ⚪ No prior reporting data
+                        </span>
+                    </div>
+
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; justify-content: space-between;">
+                        <span>Reporting Mandis: <strong th:text="${s.reportingMarketsCount}">3</strong></span>
+                        <span>Total Volume: <strong th:text="${s.totalArrivalQty + ' qtl'}">540 qtl</strong></span>
+                    </div>
+
+                    <!-- B11: Drill-down click-through to record list -->
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a th:href="@{/prices(commodityId=${s.commodityId}, from=${s.reportDate}, to=${s.reportDate})}"
+                           style="flex: 1; text-align: center; padding: 0.5rem; background: #f1f5f9; border-radius: 6px; font-size: 0.825rem; font-weight: 600; text-decoration: none; color: var(--text-main);">
+                            🔍 Drill-down Records (B11)
+                        </a>
+                        <a th:href="@{/prices/history(commodityId=${s.commodityId})}"
+                           style="padding: 0.5rem 0.75rem; background: var(--primary); color: white; border-radius: 6px; font-size: 0.825rem; font-weight: 600; text-decoration: none;">
+                            📈 History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

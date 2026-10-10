@@ -1,0 +1,223 @@
+================================================================================
+AGRICULTURAL MARKET PRICE TRACKER (AMPT) - TASK 6 MERGE CONFLICT TERMINAL LOG
+================================================================================
+Timestamp: 2026-10-10 19:34:15 IST
+Repository: KabhiAditi/Agricultural-Market-Price-Tracker
+Target Integration Branch: develop
+Source Branches: feature/B08-summary-indicators, feature/B13-alerts
+
+--------------------------------------------------------------------------------
+1. MERGE FIRST FEATURE BRANCH: feature/B08-summary-indicators -> develop
+--------------------------------------------------------------------------------
+$ git checkout develop
+Your branch is up to date with 'origin/develop'.
+Switched to branch 'develop'
+
+$ git merge --no-ff feature/B08-summary-indicators -m "Merge branch 'feature/B08-summary-indicators' into develop"
+Merge made by the 'ort' strategy.
+ src/main/java/com/ampt/controller/HomeController.java   |  20 +-
+ src/main/java/com/ampt/controller/PriceRecordController.java |  50 ++++-
+ src/main/java/com/ampt/dto/CommoditySummaryDto.java     |  65 ++++++
+ src/main/java/com/ampt/repository/PriceRecordRepository.java |   7 +
+ src/main/java/com/ampt/service/SummaryService.java | 141 +++++++++++++
+ src/main/resources/templates/dashboard.html        |  53 +++++
+ src/main/resources/templates/prices/history.html   | 231 +++++++++++++++++++++
+ src/test/java/com/ampt/controller/PriceRecordControllerTest.java |  17 ++
+ src/test/java/com/ampt/service/SummaryServiceTest.java  | 141 +++++++++++++
+ 9 files changed, 722 insertions(+), 3 deletions(-)
+ create mode 100644 src/main/java/com/ampt/dto/CommoditySummaryDto.java
+ create mode 100644 src/main/java/com/ampt/service/SummaryService.java
+ create mode 100644 src/main/resources/templates/prices/history.html
+ create mode 100644 src/test/java/com/ampt/service/SummaryServiceTest.java
+
+--------------------------------------------------------------------------------
+2. MERGE SECOND FEATURE BRANCH: feature/B13-alerts -> develop (CONFLICT TRIGGER)
+--------------------------------------------------------------------------------
+$ git merge --no-ff feature/B13-alerts
+Auto-merging src/main/java/com/ampt/repository/PriceRecordRepository.java
+CONFLICT (content): Merge conflict in src/main/java/com/ampt/repository/PriceRecordRepository.java
+Auto-merging src/main/resources/templates/dashboard.html
+CONFLICT (content): Merge conflict in src/main/resources/templates/dashboard.html
+Automatic merge failed; fix conflicts and then commit the result.
+
+--------------------------------------------------------------------------------
+3. GIT STATUS OUTPUT SHOWING UNMERGED PATHS
+--------------------------------------------------------------------------------
+$ git status
+On branch develop
+Your branch is ahead of 'origin/develop' by 2 commits.
+  (use "git push" to publish your local commits)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Changes to be committed:
+	new file:   src/main/java/com/ampt/controller/AlertController.java
+	new file:   src/main/java/com/ampt/dto/AlertItemDto.java
+	new file:   src/main/java/com/ampt/service/AlertService.java
+	modified:   src/main/java/com/ampt/service/PriceRecordService.java
+	modified:   src/main/resources/application.yml
+	new file:   src/main/resources/templates/alerts/index.html
+	new file:   src/test/java/com/ampt/controller/AlertControllerTest.java
+	new file:   src/test/java/com/ampt/service/AlertServiceTest.java
+	modified:   src/test/java/com/ampt/service/PriceRecordServiceTest.java
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+	both modified:   src/main/java/com/ampt/repository/PriceRecordRepository.java
+	both modified:   src/main/resources/templates/dashboard.html
+
+--------------------------------------------------------------------------------
+4. CONFLICT MARKERS IN src/main/resources/templates/dashboard.html
+--------------------------------------------------------------------------------
+<<<<<<< HEAD
+        <!-- B10: Summary Indicator Widgets & B11: Drill-down Links -->
+        <section style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.5rem; margin: 0;">Today's Commodity Summary & Trends (B08-B10)</h2>
+                <span style="color: var(--text-muted); font-size: 0.9rem;" th:if="${reportingDate != null}">
+                    As of: <strong th:text="${reportingDate}">2026-10-10</strong>
+                </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <div th:each="s : ${summaries}" style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <h3 style="margin: 0; font-size: 1.25rem;" th:text="${s.commodityName}">Tomato</h3>
+                        <span style="background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;" th:text="${s.unit}">quintal</span>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" th:text="'₹' + ${s.avgPrice}">₹2,150.00</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Today's Avg Modal Price</div>
+                    </div>
+
+                    <!-- B09: % Change with no prior data handling -->
+                    <div style="padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; margin-bottom: 1.25rem; font-weight: 600;"
+                         th:styleappend="${!s.hasPriorData} ? 'background: #f8fafc; color: var(--text-muted);' : (${s.percentChange >= 0} ? 'background: #f0fdf4; color: #166534;' : 'background: #fef2f2; color: #dc2626;')">
+                        <span th:if="${s.hasPriorData}">
+                            <span th:text="${s.percentChange >= 0 ? '▲ +' : '▼ '} + ${s.percentChange} + '%'">+2.5%</span>
+                            vs previous day (₹<span th:text="${s.prevDayModalPrice}">2,100</span>)
+                        </span>
+                        <span th:if="${!s.hasPriorData}">
+                            ⚪ No prior reporting data
+                        </span>
+                    </div>
+
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; display: flex; justify-content: space-between;">
+                        <span>Reporting Mandis: <strong th:text="${s.reportingMarketsCount}">3</strong></span>
+                        <span>Total Volume: <strong th:text="${s.totalArrivalQty + ' qtl'}">540 qtl</strong></span>
+                    </div>
+
+                    <!-- B11: Drill-down click-through to record list -->
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a th:href="@{/prices(commodityId=${s.commodityId}, from=${s.reportDate}, to=${s.reportDate})}"
+                           style="flex: 1; text-align: center; padding: 0.5rem; background: #f1f5f9; border-radius: 6px; font-size: 0.825rem; font-weight: 600; text-decoration: none; color: var(--text-main);">
+                            🔍 Drill-down Records (B11)
+                        </a>
+                        <a th:href="@{/prices/history(commodityId=${s.commodityId})}"
+                           style="padding: 0.5rem 0.75rem; background: var(--primary); color: white; border-radius: 6px; font-size: 0.825rem; font-weight: 600; text-decoration: none;">
+                            📈 History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+=======
+        <!-- B13-B15: Active Market Alerts & Exceptions Overview -->
+        <section style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.5rem; margin: 0; color: #dc2626;">⚠️ Market Exceptions & Volatility Alerts (B13-B15)</h2>
+                <a th:href="@{/alerts}" style="color: #dc2626; font-weight: 600; text-decoration: none; font-size: 0.9rem;">
+                    Full Surveillance Dashboard →
+                </a>
+            </div>
+            <div style="background: white; border: 1px solid var(--border); border-left: 5px solid #dc2626; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">Real-Time Exception Detection Rule</span>
+                    <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700;">
+                        ACTIVE THRESHOLD: 15%
+                    </span>
+                </div>
+                <p style="color: var(--text-muted); margin: 0 0 1rem 0; font-size: 0.95rem;">
+                    Surveillance engine automatically flags modal price movements exceeding 15% day-over-day and alerts on mandis with missing filings after 17:00 IST cutoff.
+                </p>
+                <div style="display: flex; gap: 1rem;">
+                    <a th:href="@{/alerts}" style="padding: 0.5rem 1rem; background: #dc2626; color: white; border-radius: 6px; font-size: 0.875rem; font-weight: 600; text-decoration: none;">
+                        Review Active Alerts
+                    </a>
+                </div>
+            </div>
+        </section>
+>>>>>>> feature/B13-alerts
+
+--------------------------------------------------------------------------------
+5. CONFLICT MARKERS IN src/main/java/com/ampt/repository/PriceRecordRepository.java
+--------------------------------------------------------------------------------
+<<<<<<< HEAD
+    // B09: most recent prior record for a commodity across all markets
+    Optional<PriceRecord> findTopByCommodity_IdAndRecordDateLessThanOrderByRecordDateDesc(
+            Long commodityId, LocalDate beforeDate);
+
+    // Latest available reporting date in database
+=======
+    // B14: records for a specific date across all markets/commodities
+    List<PriceRecord> findByRecordDate(LocalDate date);
+
+    // Latest available reporting date
+>>>>>>> feature/B13-alerts
+    Optional<PriceRecord> findTopByOrderByRecordDateDesc();
+
+--------------------------------------------------------------------------------
+6. RESOLUTION PROCESS
+--------------------------------------------------------------------------------
+A. For PriceRecordRepository.java:
+   - Kept both repository query methods:
+     `findTopByCommodity_IdAndRecordDateLessThanOrderByRecordDateDesc` (needed by B08-B11 summary indicators)
+     `findByRecordDate` (needed by B14 missing data rule)
+     `findTopByOrderByRecordDateDesc` (common to both features)
+
+B. For dashboard.html:
+   - Harmonized both feature components onto the dashboard home:
+     1. Displayed Active Market Alerts & Exceptions Overview (B13-B15) immediately beneath stats grid.
+     2. Displayed Today's Commodity Summary & Trends Widgets (B08-B11) with Drill-down and History links right below.
+     3. Preserved all navigation links including the new ⚠️ Alerts navbar link and login status.
+
+--------------------------------------------------------------------------------
+7. MARK CONFLICTS AS RESOLVED AND COMMIT MERGE
+--------------------------------------------------------------------------------
+$ git add src/main/java/com/ampt/repository/PriceRecordRepository.java src/main/resources/templates/dashboard.html
+$ git commit -m "Merge branch 'feature/B13-alerts' into develop (resolved merge conflict in dashboard.html and PriceRecordRepository.java)"
+[develop 0c4cae2] Merge branch 'feature/B13-alerts' into develop (resolved merge conflict in dashboard.html and PriceRecordRepository.java)
+
+--------------------------------------------------------------------------------
+8. POST-MERGE GIT GRAPH AND TREE STATUS
+--------------------------------------------------------------------------------
+$ git status
+On branch develop
+Your branch is ahead of 'origin/develop' by 4 commits.
+  (use "git push" to publish your local commits)
+nothing to commit, working tree clean
+
+$ git log --graph --oneline -n 12
+*   0c4cae2 Merge branch 'feature/B13-alerts' into develop (resolved merge conflict in dashboard.html and PriceRecordRepository.java)
+|\  
+| * 1cd26a6 feat(alerts): implement threshold breach and missing data rules (B13-B15)
+* |   e291150 Merge branch 'feature/B08-summary-indicators' into develop
+|\ \  
+| |/  
+|/|   
+| * 42aeacb feat(summary): implement daily modal/average summaries, % change, widgets, drill-down and history (B08-B12)
+|/  
+* 68e1d1a docs: update devops roadmap tracking for tasks 4 and 5
+* 3fcf6e4 docs(task05): add feature 1 documentation, PR specification, and merge evidence
+*   6e1d9c2 Merge branch 'feature/B03-price-entry' into develop (Task 5: Data Entry, Search, Role Check)
+|\  
+| * 8c1404f fix(review): address self-review comments for inverted date ranges and uniform pricing
+| * 2fe6c82 test(prices): add unit tests for PriceRecordService and MockMvc controller suites
+| * d2a37a8 feat(ui): implement price entry, edit, search views with pagination and sorting (B03, B04, B06, B07)
+| * d8611d0 feat(prices): add price record form DTO, service layer with validation, and seed data (B03, B04)
+| * 2e68fc2 feat(security): add bcrypt hashing, session auth service and role interceptor (B05)
+|/  
+================================================================================
