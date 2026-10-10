@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Price Trend History — AMPT</title>
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.35rem;
+        }
+        select {
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #fff;
+        }
+        .btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f8fafc;
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+            text-align: left;
+        }
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+        .modal-cell {
+            font-weight: 700;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a class="navbar-brand" th:href="@{/}">🌾 AMPT</a>
+        <nav class="nav-links">
+            <a th:href="@{/}">Dashboard</a>
+            <a th:href="@{/prices}">Search Prices</a>
+            <a th:href="@{/prices/history}" style="color: var(--primary); font-weight: 600;">History Trends</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Commodity Price History & Trends (B12)</h1>
+        <p style="color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 1.5rem;">
+            Full chronological trading record for single market-commodity pairs.
+        </p>
+
+        <div class="card">
+            <form th:action="@{/prices/history}" method="get" class="filter-row">
+                <div class="form-group">
+                    <label for="marketId">Select Market Mandi</label>
+                    <select id="marketId" name="marketId">
+                        <option th:each="m : ${markets}" th:value="${m.id}" th:text="${m.name}"
+                                th:selected="${m.id == selectedMarketId}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="commodityId">Select Commodity</label>
+                    <select id="commodityId" name="commodityId">
+                        <option th:each="c : ${commodities}" th:value="${c.id}" th:text="${c.name}"
+                                th:selected="${c.id == selectedCommodityId}"></option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn">View History</button>
+                </div>
+            </form>
+        </div>
+
+        <div th:if="${!historyRecords.empty}">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val" th:text="${historyRecords.size()}">14</div>
+                    <div class="stat-title">Historical Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" th:text="'₹' + ${allTimeMin}">₹1800</div>
+                    <div class="stat-title">Period Minimum</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" th:text="'₹' + ${avgModal}">₹2150</div>
+                    <div class="stat-title">Average Modal Price</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" th:text="'₹' + ${allTimeMax}">₹2500</div>
+                    <div class="stat-title">Period Maximum</div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reporting Date</th>
+                            <th>Arrival Qty</th>
+                            <th>Min Price (₹)</th>
+                            <th>Modal Price (₹)</th>
+                            <th>Max Price (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${historyRecords}">
+                            <td th:text="${r.recordDate}">2026-10-10</td>
+                            <td th:text="${r.arrivalQty + ' qtl'}">250 qtl</td>
+                            <td th:text="'₹' + ${r.minPrice}">₹1,800.00</td>
+                            <td class="modal-cell" th:text="'₹' + ${r.modalPrice}">₹2,150.00</td>
+                            <td th:text="'₹' + ${r.maxPrice}">₹2,450.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

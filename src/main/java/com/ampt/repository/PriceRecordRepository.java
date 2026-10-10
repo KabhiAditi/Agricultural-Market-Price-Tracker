@@ -26,6 +26,13 @@ public interface PriceRecordRepository extends JpaRepository<PriceRecord, Long>,
     Optional<PriceRecord> findTopByMarket_IdAndCommodity_IdAndRecordDateLessThanOrderByRecordDateDesc(
             Long marketId, Long commodityId, LocalDate beforeDate);
 
+    // B09: most recent prior record for a commodity across all markets
+    Optional<PriceRecord> findTopByCommodity_IdAndRecordDateLessThanOrderByRecordDateDesc(
+            Long commodityId, LocalDate beforeDate);
+
+    // Latest available reporting date in database
+    Optional<PriceRecord> findTopByOrderByRecordDateDesc();
+
     // B15: active alerts, most recent first
     List<PriceRecord> findByAlertTrueOrderByRecordDateDesc();
 }
