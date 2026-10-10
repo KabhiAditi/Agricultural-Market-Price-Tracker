@@ -55,29 +55,34 @@ pipeline {
         }
         
         
+        
         stage('Health Check') {
             steps {
                 script {
+                    echo 'Waiting for Tomcat application to become ready...'
                     sleep(time: 15, unit: 'SECONDS')
 
-                    def response = bat(
+                    def statusCode = bat(
                         script: '''
                             @echo off
-                            curl -s -o health-response.txt -w "%%{http_code}" http://localhost:8081/ampt/actuator/health
+                            curl.exe -s -o health-response.txt -w "%%{http_code}" http://localhost:8080/ampt/actuator/health
                         ''',
                         returnStdout: true
                     ).trim()
 
-                    echo "Health Check HTTP Status: ${response}"
+                    echo "Health Check HTTP Status: ${statusCode}"
 
-                    if (response != '200') {
-                        error("Health check failed with HTTP status: ${response}")
+                    if (statusCode != '200') {
+                        bat 'type health-response.txt'
+                        error("Health check failed. HTTP status: ${statusCode}")
                     }
 
-                    echo "Application is healthy!"
+                    echo 'Application health check passed!'
+                    bat 'type health-response.txt'
                 }
             }
         }
+
 
 
     }
