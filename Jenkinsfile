@@ -54,7 +54,6 @@ pipeline {
             }
         }
         
-        ```groovy
         stage('Health Check') {
             steps {
                 script {
