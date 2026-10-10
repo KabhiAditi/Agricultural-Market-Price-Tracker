@@ -35,6 +35,9 @@ class PriceRecordControllerTest {
     @MockBean
     private PriceRecordService priceRecordService;
 
+    @MockBean
+    private com.ampt.service.SummaryService summaryService;
+
     private AppUser entryUser;
     private AppUser viewerUser;
     private Market sampleMarket;
@@ -181,5 +184,19 @@ class PriceRecordControllerTest {
                 .andExpect(view().name("prices/form"))
                 .andExpect(model().attribute("isEdit", true))
                 .andExpect(model().attributeExists("priceForm"));
+    }
+
+    @Test
+    @DisplayName("B12: GET /prices/history renders history view with trend data")
+    void testViewHistory_PublicAccess() throws Exception {
+        when(summaryService.getMarketCommodityHistory(any(), any())).thenReturn(List.of(sampleRecord));
+
+        mockMvc.perform(get("/prices/history").param("marketId", "1").param("commodityId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("prices/history"))
+                .andExpect(model().attributeExists("historyRecords"))
+                .andExpect(model().attributeExists("allTimeMin"))
+                .andExpect(model().attributeExists("allTimeMax"))
+                .andExpect(model().attributeExists("avgModal"));
     }
 }

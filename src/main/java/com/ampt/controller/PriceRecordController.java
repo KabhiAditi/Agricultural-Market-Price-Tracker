@@ -24,9 +24,57 @@ import java.time.LocalDate;
 public class PriceRecordController {
 
     private final PriceRecordService priceRecordService;
+    private final com.ampt.service.SummaryService summaryService;
 
-    public PriceRecordController(PriceRecordService priceRecordService) {
+    public PriceRecordController(PriceRecordService priceRecordService,
+                                com.ampt.service.SummaryService summaryService) {
         this.priceRecordService = priceRecordService;
+        this.summaryService = summaryService;
+    }
+
+    /**
+     * B12: Single-record / full-history detail view for market + commodity.
+     */
+    @GetMapping("/history")
+    public String viewHistory(
+            @RequestParam(required = false) Long marketId,
+            @RequestParam(required = false) Long commodityId,
+            Model model) {
+
+        var markets = priceRecordService.findAllMarkets();
+        var commodities = priceRecordService.findAllCommodities();
+
+        Long targetMarketId = (marketId != null) ? marketId : (markets.isEmpty() ? null : markets.get(0).getId());
+        Long targetCommodityId = (commodityId != null) ? commodityId : (commodities.isEmpty() ? null : commodities.get(0).getId());
+
+        var historyList = summaryService.getMarketCommodityHistory(targetMarketId, targetCommodityId);
+
+        model.addAttribute("markets", markets);
+        model.addAttribute("commodities", commodities);
+        model.addAttribute("selectedMarketId", targetMarketId);
+        model.addAttribute("selectedCommodityId", targetCommodityId);
+        model.addAttribute("historyRecords", historyList);
+
+        if (!historyList.isEmpty()) {
+            java.math.BigDecimal allTimeMin = historyList.stream()
+                    .map(com.ampt.entity.PriceRecord::getMinPrice)
+                    .min(java.util.Comparator.naturalOrder())
+                    .orElse(java.math.BigDecimal.ZERO);
+            java.math.BigDecimal allTimeMax = historyList.stream()
+                    .map(com.ampt.entity.PriceRecord::getMaxPrice)
+                    .max(java.util.Comparator.naturalOrder())
+                    .orElse(java.math.BigDecimal.ZERO);
+            java.math.BigDecimal avgModal = historyList.stream()
+                    .map(com.ampt.entity.PriceRecord::getModalPrice)
+                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add)
+                    .divide(java.math.BigDecimal.valueOf(historyList.size()), 2, java.math.RoundingMode.HALF_UP);
+
+            model.addAttribute("allTimeMin", allTimeMin);
+            model.addAttribute("allTimeMax", allTimeMax);
+            model.addAttribute("avgModal", avgModal);
+        }
+
+        return "prices/history";
     }
 
     /**
