@@ -8,7 +8,7 @@ pipeline {
     
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['dev', 'test', 'prod'], description: 'Target deployment environment')
-        string(name: 'SERVER_PORT', defaultValue: '8080', description: 'Tomcat Server Port (Change if Tomcat is on 8081)')
+        string(name: 'SERVER_PORT', defaultValue: '8081', description: 'Tomcat Server Port (Change if Tomcat is on 8081)')
         string(name: 'DEPLOY_PATH', defaultValue: 'C:\\Program Files\\Apache Software Foundation\\Tomcat 11.0\\webapps', description: 'Path to Tomcat webapps directory')
     }
     
@@ -65,7 +65,7 @@ pipeline {
                     def statusCode = bat(
                         script: '''
                             @echo off
-                            curl.exe -s -o health-response.txt -w "%%{http_code}" http://localhost:8080/ampt/actuator/health
+                            curl.exe -s -o health-response.txt -w "%%{http_code}" http://localhost:8081/ampt/actuator/health
                         ''',
                         returnStdout: true
                     ).trim()
