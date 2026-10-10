@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Alerts & Exceptions - AMPT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-dark: #166534;
+            --primary-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a.active { color: var(--danger); font-weight: 600; }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .header-section {
+            margin-bottom: 2rem;
+        }
+        .header-section h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .header-section p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 1rem;
+        }
+        .config-banner {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--danger);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .config-metric {
+            display: flex;
+            flex-direction: column;
+        }
+        .config-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .config-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+        }
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-muted);
+            background: transparent;
+            transition: all 0.15s;
+        }
+        .filter-tab.active {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+        .alert-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .alert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .alert-card.threshold {
+            border-left: 5px solid var(--danger);
+        }
+        .alert-card.missing {
+            border-left: 5px solid var(--warning);
+        }
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .alert-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+        .badge-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+        .badge-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        .alert-body {
+            font-size: 0.925rem;
+            color: var(--text-muted);
+        }
+        .alert-meta {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border);
+            flex-wrap: wrap;
+        }
+        .alert-meta strong {
+            color: var(--text-main);
+        }
+        .empty-state {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a class="navbar-brand" th:href="@{/}">🌾 AMPT</a>
+        <nav class="nav-links">
+            <a th:href="@{/}">Dashboard</a>
+            <a th:href="@{/prices}">Search Prices</a>
+            <a th:href="@{/prices/new}">+ New Price</a>
+            <a th:href="@{/alerts}" class="active">⚠️ Alerts (<span th:text="${totalAlertsCount}">0</span>)</a>
+            <span th:if="${session.currentUser != null}">
+                <span class="badge" style="background: #e2e8f0; color: #334155;" th:text="${session.currentUser.username}">user</span>
+                <a th:href="@{/logout}" style="margin-left: 0.5rem; color: var(--text-muted);">Logout</a>
+            </span>
+            <span th:if="${session.currentUser == null}">
+                <a th:href="@{/login}">Login</a>
+            </span>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="header-section">
+            <h1>⚠️ Active Market Alerts & Exceptions</h1>
+            <p>Automated surveillance for abnormal commodity price fluctuations and missing mandi arrival filings (B13-B15).</p>
+        </div>
+
+        <!-- Configuration Banner (B13 + B14 parameters) -->
+        <div class="config-banner">
+            <div class="config-metric">
+                <span class="config-label">Active Anomaly Threshold (B13)</span>
+                <span class="config-value" th:text="${thresholdPercent + '%'}">15.0%</span>
+            </div>
+            <div class="config-metric">
+                <span class="config-label">Filing Cutoff Hour (B14)</span>
+                <span class="config-value" th:text="${cutoffHour + ':00 IST'}">17:00 IST</span>
+            </div>
+            <div class="config-metric">
+                <span class="config-label">Price Spikes / Drops</span>
+                <span class="config-value" style="color: var(--danger);" th:text="${thresholdCount}">0</span>
+            </div>
+            <div class="config-metric">
+                <span class="config-label">Missing Mandi Filings</span>
+                <span class="config-value" style="color: var(--warning);" th:text="${missingCount}">0</span>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <a class="filter-tab" th:classappend="${filter == 'all' ? 'active' : ''}" th:href="@{/alerts(filter='all')}">
+                All Exceptions (<span th:text="${totalAlertsCount}">0</span>)
+            </a>
+            <a class="filter-tab" th:classappend="${filter == 'threshold' ? 'active' : ''}" th:href="@{/alerts(filter='threshold')}">
+                Threshold Spikes & Drops (B13) (<span th:text="${thresholdCount}">0</span>)
+            </a>
+            <a class="filter-tab" th:classappend="${filter == 'missing' ? 'active' : ''}" th:href="@{/alerts(filter='missing')}">
+                Missing Daily Filings (B14) (<span th:text="${missingCount}">0</span>)
+            </a>
+        </div>
+
+        <!-- Alert Cards List -->
+        <div th:if="${#lists.isEmpty(alerts)}" class="empty-state">
+            <h3>🎉 No Active Exceptions Found</h3>
+            <p>All commodity prices are within normal volatility bounds (&plusmn;<span th:text="${thresholdPercent}">15</span>%) and all mandis have reported.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(alerts)}">
+            <div th:each="a : ${alerts}" class="alert-card" th:classappend="${a.type == 'THRESHOLD_BREACH' ? 'threshold' : 'missing'}">
+                <div class="alert-header">
+                    <h2 class="alert-title" th:text="${a.title}">Alert Title</h2>
+                    <div>
+                        <span class="badge" th:classappend="${a.severity == 'HIGH' ? 'badge-danger' : 'badge-warning'}" th:text="${a.severity + ' SEVERITY'}">HIGH</span>
+                        <span class="badge" style="background: #f1f5f9; color: #475569;" th:text="${a.type}">THRESHOLD_BREACH</span>
+                    </div>
+                </div>
+                <div class="alert-body" th:text="${a.message}">
+                    Alert details message.
+                </div>
+                <div class="alert-meta">
+                    <span>Mandi: <strong th:text="${a.marketName}">Nagpur APMC</strong></span>
+                    <span>Commodity: <strong th:text="${a.commodityName}">Soybean</strong></span>
+                    <span>Date: <strong th:text="${a.alertDate}">2026-10-10</strong></span>
+                    <span th:if="${a.type == 'THRESHOLD_BREACH'}">
+                        Movement: <strong th:text="${a.percentChange + '%'}">+18.5%</strong>
+                    </span>
+                    <span th:if="${a.type == 'THRESHOLD_BREACH'}">
+                        Price: <strong th:text="'₹' + ${a.currentPrice}">₹4,950</strong> (Prior: ₹<span th:text="${a.previousPrice}">4,100</span>)
+                    </span>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

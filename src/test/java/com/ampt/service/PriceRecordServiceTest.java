@@ -39,6 +39,9 @@ class PriceRecordServiceTest {
     @Mock
     private CommodityRepository commodityRepository;
 
+    @Mock
+    private AlertService alertService;
+
     @InjectMocks
     private PriceRecordService priceRecordService;
 
