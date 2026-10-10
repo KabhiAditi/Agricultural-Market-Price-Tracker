@@ -63,7 +63,7 @@ pipeline {
                     def response = bat(
                         script: '''
                             @echo off
-                            curl -s -o health-response.txt -w "%%{http_code}" http://localhost:8080/ampt/actuator/health
+                            curl -s -o health-response.txt -w "%%{http_code}" http://localhost:8081/ampt/actuator/health
                         ''',
                         returnStdout: true
                     ).trim()
@@ -79,7 +79,6 @@ pipeline {
             }
         }
 
-        
 
     }
     
