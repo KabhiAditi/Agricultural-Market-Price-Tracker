@@ -57,31 +57,29 @@ pipeline {
         
         stage('Health Check') {
             steps {
-                echo 'Waiting for Tomcat to deploy the application...'
-                sleep(time: 15, unit: 'SECONDS')
+                script {
+                    sleep(time: 15, unit: 'SECONDS')
 
-                powershell '''
-                    $url = "http://localhost:8081/ampt/"
+                    def response = bat(
+                        script: '''
+                            @echo off
+                            curl -s -o health-response.txt -w "%%{http_code}" http://localhost:8080/ampt/actuator/health
+                        ''',
+                        returnStdout: true
+                    ).trim()
 
-                    try {
-                        $response = Invoke-WebRequest `
-                            -Uri $url `
-                            -MaximumRedirection 5 `
-                            -TimeoutSec 30 `
-                            -UseBasicParsing
+                    echo "Health Check HTTP Status: ${response}"
 
-                        if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 400) {
-                            Write-Host "Health check passed: HTTP $($response.StatusCode)"
-                        } else {
-                            throw "Unexpected HTTP status: $($response.StatusCode)"
-                        }
-                    } catch {
-                        Write-Error "Health check failed: $_"
-                        exit 1
+                    if (response != '200') {
+                        error("Health check failed with HTTP status: ${response}")
                     }
-                '''
+
+                    echo "Application is healthy!"
+                }
             }
-    }
+        }
+
+        
 
     }
     
