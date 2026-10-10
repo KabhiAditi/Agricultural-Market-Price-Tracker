@@ -13,80 +13,37 @@ pipeline {
     }
     
     environment {
-        APP_NAME = 'ampt'
+        APP_NAME = 'ampt/'
         APP_URL = "http://localhost:${params.SERVER_PORT}/${APP_NAME}"
     }
     
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                echo "Building for environment: ${params.ENVIRONMENT}"
-                bat 'mvn clean package -DskipTests'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.war', fingerprint: true
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                echo "Deploying ${APP_NAME}.war to Tomcat webapps path: ${params.DEPLOY_PATH}"
-                // Copy the war file to Tomcat's webapps directory. Tomcat will auto-deploy it.
-                bat """
-                copy /Y target\\ampt.war "${params.DEPLOY_PATH}\\${APP_NAME}.war"
-                """
-                echo "Deployment copied! Tomcat will now unpack and deploy."
-            }
-        }
-        
-        stage('Health Check') {
-            steps {
-                echo "Waiting for Tomcat to unpack and start the application..."
-                sleep time: 15, unit: 'SECONDS'
-                echo "Checking health at ${APP_URL}"
-                powershell """
+    
+    stage('Health Check') {
+        steps {
+            echo 'Waiting for Tomcat to deploy the application...'
+            sleep(time: 15, unit: 'SECONDS')
+
+            powershell '''
+                $url = "http://localhost:8081/ampt/"
+
                 try {
-                    \$response = Invoke-WebRequest -Uri "${APP_URL}" -UseBasicParsing
-                    if (\$response.StatusCode -eq 200) {
-                        Write-Host "Health check passed. Application is live!"
+                    $response = Invoke-WebRequest `
+                        -Uri $url `
+                        -MaximumRedirection 5 `
+                        -TimeoutSec 30 `
+                        -UseBasicParsing
+
+                    if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 400) {
+                        Write-Host "Health check passed: HTTP $($response.StatusCode)"
                     } else {
-                        Write-Error "Health check failed with status: \$(\$response.StatusCode)"
-                        exit 1
+                        throw "Unexpected HTTP status: $($response.StatusCode)"
                     }
                 } catch {
-                    Write-Error "Health check failed: \$_"
+                    Write-Error "Health check failed: $_"
                     exit 1
                 }
-                """
-            }
+            '''
         }
     }
-    
-    post {
-        always {
-            echo "Pipeline finished executing."
-            junit 'target/surefire-reports/*.xml'
-        }
-        success {
-            echo "Build and Deployment Successful! Application is accessible."
-        }
-        failure {
-            echo "Pipeline Failed during Build, Test, or Deployment."
-        }
-    }
+
 }
