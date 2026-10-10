@@ -1,0 +1,18 @@
+﻿*   6e1d9c2 - 2026-10-10 18:50:30 - Merge branch 'feature/B03-price-entry' into develop (Task 5: Data Entry, Search, Role Check) (DevOps Pair)
+|\  
+| * 8c1404f - 2026-10-10 18:49:51 - fix(review): address self-review comments for inverted date ranges and uniform pricing (DevOps Pair)
+| * 2fe6c82 - 2026-10-10 18:47:54 - test(prices): add unit tests for PriceRecordService and MockMvc controller suites (DevOps Pair)
+| * d2a37a8 - 2026-10-10 18:47:46 - feat(ui): implement price entry, edit, search views with pagination and sorting (B03, B04, B06, B07) (DevOps Pair)
+| * d8611d0 - 2026-10-10 18:47:26 - feat(prices): add price record form DTO, service layer with validation, and seed data (B03, B04) (DevOps Pair)
+| * 2e68fc2 - 2026-10-10 18:47:18 - feat(security): add bcrypt hashing, session auth service and role interceptor (B05) (DevOps Pair)
+|/  
+* 78f74a3 - 2026-10-10 14:19:07 - docs(evidence): capture task 4 git logs, branch list, and remotes (DevOps Pair)
+* d88e9f7 - 2026-10-10 14:15:24 - docs: add laboratory commands guide reference document (DevOps Pair)
+* 368911e - 2026-10-10 14:14:42 - docs(backlog): add github issue definitions for B01-B15 and automation script (DevOps Pair)
+* dc09571 - 2026-10-10 14:14:25 - ci(github): add issue templates, pull request template, and branching strategy guide (DevOps Pair)
+* d26620a - 2026-10-10 14:14:09 - docs: expand professional README with architecture, run guide, and task roadmap (DevOps Pair)
+* 841b241 - 2026-10-10 14:13:59 - chore(structure): add skeleton directories for docker, jenkins, ansible and selenium test notes (DevOps Pair)
+* 74c8943 - 2026-10-10 14:13:48 - chore(git): update .gitignore for maven, ides, docker, jenkins and temp files (DevOps Pair)
+* a29fa43 - 2026-10-10 14:12:24 - docs: update task 3 submission report document with srs, diagrams and api list (DevOps Pair)
+* e5be4d5 - 2026-10-08 22:57:24 - docs: add architecture documentation, diagrams, and task 3 verification evidence (DevOps Pair)
+* 4163637 - 2026-10-08 22:46:26 - chore: initial scaffold baseline (DevOps Pair)

@@ -174,8 +174,8 @@ Agricultural-Market-Price-Tracker/
 | **Task 01** | Problem Definition & Scope Specification | Done | [docs/01-problem-definition-scope.md](docs/01-problem-definition-scope.md) |
 | **Task 02** | Agile Planning & DevOps Workflow (15 Backlog Stories) | Done | [docs/02-agile-planning-devops-workflow.md](02-agile-planning-devops-workflow.md) |
 | **Task 03** | Architecture, SRS, Entities & Health Endpoints | Done | [docs/03-architecture.md](docs/03-architecture.md) |
-| **Task 04** | Git & GitHub Repo Init, Branching, Issues, Templates | In Progress | [docs/BRANCHING.md](docs/BRANCHING.md), [docs/issues-to-create.md](docs/issues-to-create.md) |
-| **Task 05** | Build Tool Automation & Packaging (Maven WAR / profiles) | Upcoming | `pom.xml` |
+| **Task 04** | Git & GitHub Repo Init, Branching, Issues, Templates | Done | [docs/BRANCHING.md](docs/BRANCHING.md), [docs/issues-to-create.md](docs/issues-to-create.md) |
+| **Task 05** | Feature 1 on Branch: Data Entry, Search & Role Check | Done | [docs/05-feature1.md](docs/05-feature1.md), [review-notes](docs/evidence/task05/review-notes.md) |
 | **Task 06** | Unit Testing & Test Coverage (JUnit 5 & JaCoCo) | Upcoming | `src/test/` |
 | **Task 07** | Static Code Analysis & Linting | Upcoming | SonarQube / Checkstyle |
 | **Task 08** | Artifact Management & Versioning | Upcoming | Nexus / Artifactory |

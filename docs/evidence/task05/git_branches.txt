@@ -1,0 +1,6 @@
+﻿* develop                        6e1d9c2 [ahead 6] Merge branch 'feature/B03-price-entry' into develop (Task 5: Data Entry, Search, Role Check)
+  feature/B03-price-entry        8c1404f fix(review): address self-review comments for inverted date ranges and uniform pricing
+  feature/t03-architecture-setup d88e9f7 docs: add laboratory commands guide reference document
+  main                           78f74a3 docs(evidence): capture task 4 git logs, branch list, and remotes
+  remotes/origin/develop         78f74a3 docs(evidence): capture task 4 git logs, branch list, and remotes
+  remotes/origin/main            78f74a3 docs(evidence): capture task 4 git logs, branch list, and remotes
