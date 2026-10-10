@@ -28,13 +28,16 @@ public class PriceRecordService {
     private final PriceRecordRepository priceRecordRepository;
     private final MarketRepository marketRepository;
     private final CommodityRepository commodityRepository;
+    private final AlertService alertService;
 
     public PriceRecordService(PriceRecordRepository priceRecordRepository,
                               MarketRepository marketRepository,
-                              CommodityRepository commodityRepository) {
+                              CommodityRepository commodityRepository,
+                              AlertService alertService) {
         this.priceRecordRepository = priceRecordRepository;
         this.marketRepository = marketRepository;
         this.commodityRepository = commodityRepository;
+        this.alertService = alertService;
     }
 
     /**
@@ -89,6 +92,7 @@ public class PriceRecordService {
         record.setArrivalQty(form.getArrivalQty());
         record.setCreatedBy(user);
 
+        alertService.checkAndApplyThresholdRule(record);
         return priceRecordRepository.save(record);
     }
 
@@ -109,6 +113,7 @@ public class PriceRecordService {
         record.setModalPrice(form.getModalPrice());
         record.setArrivalQty(form.getArrivalQty());
 
+        alertService.checkAndApplyThresholdRule(record);
         return priceRecordRepository.save(record);
     }
 
