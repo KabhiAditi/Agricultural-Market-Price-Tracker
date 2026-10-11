@@ -41,12 +41,23 @@ public abstract class BaseUiTest implements ScreenshotOnFailureExtension.DriverP
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--remote-allow-origins=*");
 
-        // Fallback for custom Windows user AppData Chrome installations
-        String localAppData = System.getenv("LOCALAPPDATA");
-        if (localAppData != null) {
-            File userChrome = new File(localAppData, "Google\\Chrome\\Application\\chrome.exe");
-            if (userChrome.exists()) {
-                options.setBinary(userChrome);
+        // Comprehensive Chrome binary detection across Windows user profiles & Program Files
+        String[] possibleChromePaths = {
+            "C:\\Users\\91976\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            System.getenv("LOCALAPPDATA") != null ? System.getenv("LOCALAPPDATA") + "\\Google\\Chrome\\Application\\chrome.exe" : null,
+            System.getenv("PROGRAMFILES") != null ? System.getenv("PROGRAMFILES") + "\\Google\\Chrome\\Application\\chrome.exe" : null,
+            System.getenv("PROGRAMFILES(X86)") != null ? System.getenv("PROGRAMFILES(X86)") + "\\Google\\Chrome\\Application\\chrome.exe" : null
+        };
+
+        for (String path : possibleChromePaths) {
+            if (path != null) {
+                File candidate = new File(path);
+                if (candidate.exists()) {
+                    options.setBinary(candidate);
+                    break;
+                }
             }
         }
 
