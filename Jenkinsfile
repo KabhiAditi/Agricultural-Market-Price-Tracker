@@ -43,7 +43,23 @@ pipeline {
             }
         }
         
+        stage('UI Tests') {
+            steps {
+                echo "Running Headless Chrome Selenium Acceptance Tests (Quality Gate)..."
+                bat 'mvn verify -Pui-tests'
+            }
+            post {
+                always {
+                    junit testResults: 'target/surefire-reports/*.xml,target/failsafe-reports/*.xml', allowEmptyResults: true
+                    archiveArtifacts artifacts: 'target/screenshots/**', allowEmptyArchive: true
+                }
+            }
+        }
+        
         stage('Deploy') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
             steps {
                 echo "Deploying ${APP_NAME}.war to Tomcat webapps path: ${params.DEPLOY_PATH}"
                 // Copy the war file to Tomcat's webapps directory. Tomcat will auto-deploy it.
@@ -88,13 +104,14 @@ pipeline {
     post {
         always {
             echo "Pipeline finished executing."
-            junit 'target/surefire-reports/*.xml'
+            junit testResults: 'target/surefire-reports/*.xml,target/failsafe-reports/*.xml', allowEmptyResults: true
+            archiveArtifacts artifacts: 'target/screenshots/**', allowEmptyArchive: true
         }
         success {
-            echo "Build and Deployment Successful! Application is accessible."
+            echo "Build, Test Quality Gate, and Deployment Successful! Application is verified."
         }
         failure {
-            echo "Pipeline Failed during Build, Test, or Deployment."
+            echo "Pipeline Failed! Deployment was prevented by the Quality Gate."
         }
     }
 }
