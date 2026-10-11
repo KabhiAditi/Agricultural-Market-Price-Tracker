@@ -23,7 +23,11 @@ public abstract class BaseUiTest implements ScreenshotOnFailureExtension.DriverP
 
     @BeforeAll
     public static void setupWebDriverManager() {
-        WebDriverManager.chromedriver().setup();
+        // Only invoke WebDriverManager if chromedriver isn't already specified.
+        // Jenkins passes -Dwebdriver.chrome.driver explicitly; skip WDM download in that case.
+        if (System.getProperty("webdriver.chrome.driver") == null) {
+            WebDriverManager.chromedriver().setup();
+        }
     }
 
     @BeforeEach
@@ -41,22 +45,31 @@ public abstract class BaseUiTest implements ScreenshotOnFailureExtension.DriverP
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--remote-allow-origins=*");
 
-        // Comprehensive Chrome binary detection across Windows user profiles & Program Files
-        String[] possibleChromePaths = {
-            "C:\\Users\\91976\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
-            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-            System.getenv("LOCALAPPDATA") != null ? System.getenv("LOCALAPPDATA") + "\\Google\\Chrome\\Application\\chrome.exe" : null,
-            System.getenv("PROGRAMFILES") != null ? System.getenv("PROGRAMFILES") + "\\Google\\Chrome\\Application\\chrome.exe" : null,
-            System.getenv("PROGRAMFILES(X86)") != null ? System.getenv("PROGRAMFILES(X86)") + "\\Google\\Chrome\\Application\\chrome.exe" : null
-        };
+        // 1. Check if chrome.bin system property was set by Jenkins Jenkinsfile
+        String chromeBinProp = System.getProperty("chrome.bin");
+        if (chromeBinProp != null && new File(chromeBinProp).exists()) {
+            options.setBinary(new File(chromeBinProp));
+        } else {
+            // 2. Fallback: scan well-known Windows paths (including hardcoded user profile for Jenkins LocalSystem)
+            String[] possibleChromePaths = {
+                "C:\\Users\\91976\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
+                "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+                "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+                System.getenv("LOCALAPPDATA") != null
+                    ? System.getenv("LOCALAPPDATA") + "\\Google\\Chrome\\Application\\chrome.exe" : null,
+                System.getenv("PROGRAMFILES") != null
+                    ? System.getenv("PROGRAMFILES") + "\\Google\\Chrome\\Application\\chrome.exe" : null,
+                System.getenv("PROGRAMFILES(X86)") != null
+                    ? System.getenv("PROGRAMFILES(X86)") + "\\Google\\Chrome\\Application\\chrome.exe" : null
+            };
 
-        for (String path : possibleChromePaths) {
-            if (path != null) {
-                File candidate = new File(path);
-                if (candidate.exists()) {
-                    options.setBinary(candidate);
-                    break;
+            for (String path : possibleChromePaths) {
+                if (path != null) {
+                    File candidate = new File(path);
+                    if (candidate.exists()) {
+                        options.setBinary(candidate);
+                        break;
+                    }
                 }
             }
         }

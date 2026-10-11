@@ -15,6 +15,8 @@ pipeline {
     environment {
         APP_NAME = 'ampt'
         APP_URL = "http://localhost:${params.SERVER_PORT}/${APP_NAME}"
+        CHROME_BIN = 'C:\\Users\\91976\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe'
+        CHROMEDRIVER_PATH = 'C:\\Users\\91976\\.cache\\selenium\\chromedriver\\win64\\154.0.8037.92\\chromedriver.exe'
     }
     
     stages {
@@ -46,7 +48,9 @@ pipeline {
         stage('UI Tests') {
             steps {
                 echo "Running Headless Chrome Selenium Acceptance Tests (Quality Gate)..."
-                bat 'mvn verify -Pui-tests'
+                bat """
+                    mvn verify -Pui-tests "-Dwebdriver.chrome.driver=${CHROMEDRIVER_PATH}" "-Dchrome.bin=${CHROME_BIN}" "-Dwdm.cachePath=C:\\Users\\91976\\.cache\\selenium"
+                """
             }
             post {
                 always {
