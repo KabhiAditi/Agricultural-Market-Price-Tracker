@@ -107,9 +107,8 @@ public class SummaryService {
 
                     if (prevAvg.compareTo(BigDecimal.ZERO) > 0) {
                         BigDecimal diff = avgModal.subtract(prevAvg);
-                        // INTENTIONAL DEFECT DEMO: Divides by today's avgModal instead of yesterday's prevAvg
                         BigDecimal pct = diff.multiply(BigDecimal.valueOf(100))
-                                .divide(avgModal, 2, RoundingMode.HALF_UP);
+                                .divide(prevAvg, 2, RoundingMode.HALF_UP);
                         dto.setPercentChange(pct);
                         dto.setHasPriorData(true);
                     } else {
