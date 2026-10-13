@@ -75,6 +75,9 @@ pipeline {
         }
         
         stage('Health Check') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
             steps {
                 script {
                     echo 'Checking application health on Tomcat...'
