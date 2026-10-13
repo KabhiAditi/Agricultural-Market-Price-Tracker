@@ -127,6 +127,7 @@
                                     <goal>start</goal>
                                 </goals>
                                 <configuration>
+                                    <jvmArguments>-Dserver.port=8082</jvmArguments>
                                     <wait>1000</wait>
                                     <maxAttempts>60</maxAttempts>
                                 </configuration>
@@ -148,6 +149,8 @@
                             </includes>
                             <systemPropertyVariables>
                                 <base.url>${base.url}</base.url>
+                                <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
+                                <chrome.bin>${chrome.bin}</chrome.bin>
                             </systemPropertyVariables>
                         </configuration>
                         <executions>
