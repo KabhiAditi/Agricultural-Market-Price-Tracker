@@ -8,8 +8,8 @@ pipeline {
     
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['dev', 'test', 'prod'], description: 'Target deployment environment')
-        string(name: 'SERVER_PORT', defaultValue: '8081', description: 'Tomcat Server Port (Change if Tomcat is on 8081)')
-        string(name: 'DEPLOY_PATH', defaultValue: 'C:\\Program Files\\Apache Software Foundation\\Tomcat 11.0\\webapps', description: 'Path to Tomcat webapps directory')
+        string(name: 'SERVER_PORT', defaultValue: '8081', description: 'Tomcat Server Port')
+        string(name: 'DEPLOY_PATH', defaultValue: 'C:\\Tomcat 11.0\\webapps', description: 'Path to Tomcat webapps directory')
     }
     
     environment {
@@ -65,16 +65,16 @@ pipeline {
                 expression { currentBuild.currentResult == 'SUCCESS' }
             }
             steps {
-                echo "Deploying ${APP_NAME}.war to Tomcat webapps path: ${params.DEPLOY_PATH}"
+                echo "Deploying ${APP_NAME}.war to Tomcat webapps: ${params.DEPLOY_PATH}"
                 bat """
                     @echo off
-                    REM Remove old exploded WAR directory so Tomcat performs a clean redeploy
+                    REM Remove old exploded WAR directory for a clean redeploy
                     if exist "${params.DEPLOY_PATH}\\${APP_NAME}" (
                         echo Removing old exploded app directory...
                         rmdir /s /q "${params.DEPLOY_PATH}\\${APP_NAME}"
                     )
                     REM Copy the new WAR - Tomcat autodeploy will pick it up
-                    echo Copying new WAR...
+                    echo Copying new WAR to ${params.DEPLOY_PATH}...
                     copy /Y target\\ampt.war "${params.DEPLOY_PATH}\\${APP_NAME}.war"
                     echo WAR copied successfully.
                 """
