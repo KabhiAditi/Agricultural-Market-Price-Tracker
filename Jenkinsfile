@@ -66,11 +66,19 @@ pipeline {
             }
             steps {
                 echo "Deploying ${APP_NAME}.war to Tomcat webapps path: ${params.DEPLOY_PATH}"
-                // Copy the war file to Tomcat's webapps directory. Tomcat will auto-deploy it.
                 bat """
-                copy /Y target\\ampt.war "${params.DEPLOY_PATH}\\${APP_NAME}.war"
+                    @echo off
+                    REM Remove old exploded WAR directory so Tomcat performs a clean redeploy
+                    if exist "${params.DEPLOY_PATH}\\${APP_NAME}" (
+                        echo Removing old exploded app directory...
+                        rmdir /s /q "${params.DEPLOY_PATH}\\${APP_NAME}"
+                    )
+                    REM Copy the new WAR - Tomcat autodeploy will pick it up
+                    echo Copying new WAR...
+                    copy /Y target\\ampt.war "${params.DEPLOY_PATH}\\${APP_NAME}.war"
+                    echo WAR copied successfully.
                 """
-                echo "Deployment copied! Tomcat will now unpack and deploy."
+                echo "Deployment complete. Waiting for Tomcat to unpack and start the app..."
             }
         }
         
@@ -82,7 +90,8 @@ pipeline {
                 script {
                     echo 'Checking application health on Tomcat...'
 
-                    retry(6) {
+                    // 18 retries x 10 seconds = 3 minutes for Tomcat to unpack + start
+                    retry(18) {
                         sleep(time: 10, unit: 'SECONDS')
 
                         def statusCode = bat(
