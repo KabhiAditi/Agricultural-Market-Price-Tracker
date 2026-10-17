@@ -1,0 +1,176 @@
+=== Current Branch & Status ===
+On branch develop
+Your branch is ahead of 'origin/develop' by 15 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .dockerignore
+	modified:   .github/ISSUE_TEMPLATE/bug_report.md
+	modified:   .github/ISSUE_TEMPLATE/feature_request.md
+	modified:   .github/ISSUE_TEMPLATE/task.md
+	modified:   .github/pull_request_template.md
+	modified:   .gitignore
+	modified:   02-agile-planning-devops-workflow.md
+	modified:   Dockerfile
+	modified:   Jenkinsfile
+	modified:   README.md
+	modified:   ansible/.gitkeep
+	modified:   ansible/Dockerfile.control
+	modified:   ansible/Dockerfile.target
+	modified:   ansible/ansible.cfg
+	modified:   ansible/docker-compose.yml
+	modified:   ansible/group_vars/all.yml
+	modified:   ansible/inventory.ini
+	modified:   ansible/release.yml
+	modified:   ansible/roles/ampt_app/defaults/main.yml
+	modified:   ansible/roles/ampt_app/handlers/main.yml
+	modified:   ansible/roles/ampt_app/tasks/main.yml
+	modified:   ansible/roles/ampt_app/templates/ampt-runner.sh.j2
+	modified:   ansible/roles/ampt_app/templates/ampt.env.j2
+	modified:   ansible/roles/ampt_app/templates/ampt.service.j2
+	modified:   ansible/roles/ampt_app/templates/application.yml.j2
+	modified:   ansible/roles/common/defaults/main.yml
+	modified:   ansible/roles/common/handlers/main.yml
+	modified:   ansible/roles/common/tasks/main.yml
+	modified:   ansible/rollback.yml
+	modified:   ansible/site.yml
+	modified:   docker-compose.yml
+	modified:   docker/.gitkeep
+	modified:   docker/command-log.txt
+	modified:   docs/02-agile-planning-devops-workflow.md
+	modified:   docs/03-architecture.md
+	modified:   docs/05-feature1.md
+	modified:   docs/06-mvp-release.md
+	modified:   docs/07-jenkins-setup.md
+	modified:   docs/08-pipeline-deploy.md
+	modified:   docs/09-test-plan.md
+	modified:   docs/11-docker-lifecycle.md
+	modified:   docs/12-cicd-docker.md
+	modified:   docs/13-config-spec.md
+	modified:   docs/14-provisioning-reliability.md
+	modified:   docs/BRANCHING.md
+	modified:   docs/evidence/task04/git_branches.txt
+	modified:   docs/evidence/task04/git_log.txt
+	modified:   docs/evidence/task04/git_remotes.txt
+	modified:   docs/evidence/task05/git_branches.txt
+	modified:   docs/evidence/task05/git_log_graph.txt
+	modified:   docs/evidence/task05/pull-request.md
+	modified:   docs/evidence/task05/review-notes.md
+	modified:   docs/evidence/task06/conflict-log.txt
+	modified:   docs/evidence/task07/.gitkeep
+	modified:   docs/evidence/task08/.gitkeep
+	modified:   docs/evidence/task09/TEST-com.ampt.ui.AmptJourneysIT.xml
+	modified:   docs/evidence/task09/failsafe-summary.xml
+	modified:   docs/evidence/task13/first-run.log
+	modified:   docs/evidence/task14/1-clean-provision.log
+	modified:   docs/evidence/task14/2-idempotency.log
+	modified:   docs/evidence/task14/3-deploy-v101-health.log
+	modified:   docs/evidence/task14/3-deploy-v101.log
+	modified:   docs/evidence/task14/4-rollback-v100-health.log
+	modified:   docs/evidence/task14/4-rollback-v100.log
+	modified:   docs/evidence/task14/health-check.log
+	modified:   docs/images/architecture.mmd
+	modified:   docs/images/er.mmd
+	modified:   docs/images/use-case.mmd
+	modified:   docs/issues-to-create.md
+	modified:   docs/selenium-tests.md
+	modified:   jenkins/.gitkeep
+	modified:   pom.xml
+	modified:   scripts/create-issues.ps1
+	modified:   scripts/health-check.sh
+	modified:   scripts/run-task14.sh
+	modified:   src/main/java/com/ampt/config/DataInitializer.java
+	modified:   src/main/java/com/ampt/config/SecurityBeansConfig.java
+	modified:   src/main/java/com/ampt/config/WebMvcConfig.java
+	modified:   src/main/java/com/ampt/controller/AlertController.java
+	modified:   src/main/java/com/ampt/controller/AuthController.java
+	modified:   src/main/java/com/ampt/controller/HomeController.java
+	modified:   src/main/java/com/ampt/controller/PriceRecordController.java
+	modified:   src/main/java/com/ampt/dto/AlertItemDto.java
+	modified:   src/main/java/com/ampt/dto/CommoditySummaryDto.java
+	modified:   src/main/java/com/ampt/dto/PriceRecordForm.java
+	modified:   src/main/java/com/ampt/interceptor/RoleCheckInterceptor.java
+	modified:   src/main/java/com/ampt/repository/PriceRecordRepository.java
+	modified:   src/main/java/com/ampt/service/AlertService.java
+	modified:   src/main/java/com/ampt/service/AuthService.java
+	modified:   src/main/java/com/ampt/service/PriceRecordService.java
+	modified:   src/main/java/com/ampt/service/SummaryService.java
+	modified:   src/main/resources/application-dev.yml
+	modified:   src/main/resources/application-test.yml
+	modified:   src/main/resources/application.yml
+	modified:   src/main/resources/templates/alerts/index.html
+	modified:   src/main/resources/templates/dashboard.html
+	modified:   src/main/resources/templates/login.html
+	modified:   src/main/resources/templates/prices/form.html
+	modified:   src/main/resources/templates/prices/history.html
+	modified:   src/main/resources/templates/prices/search.html
+	modified:   src/test/java/com/ampt/controller/AlertControllerTest.java
+	modified:   src/test/java/com/ampt/controller/AuthControllerTest.java
+	modified:   src/test/java/com/ampt/controller/PriceRecordControllerTest.java
+	modified:   src/test/java/com/ampt/service/AlertServiceTest.java
+	modified:   src/test/java/com/ampt/service/PriceRecordServiceTest.java
+	modified:   src/test/java/com/ampt/service/SummaryServiceTest.java
+	modified:   src/test/java/com/ampt/ui/AmptJourneysIT.java
+	modified:   src/test/java/com/ampt/ui/BaseUiTest.java
+	modified:   src/test/java/com/ampt/ui/extension/ScreenshotOnFailureExtension.java
+	modified:   src/test/java/com/ampt/ui/pages/AlertsPage.java
+	modified:   src/test/java/com/ampt/ui/pages/DashboardPage.java
+	modified:   src/test/java/com/ampt/ui/pages/LoginPage.java
+	modified:   src/test/java/com/ampt/ui/pages/PriceFormPage.java
+	modified:   src/test/java/com/ampt/ui/pages/PriceSearchPage.java
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.gitattributes
+	Task 04_23102A0025.docx
+	Task 05_23102A0025.docx
+	scripts/run-task15-delivery.sh
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+=== Recent Commits on develop ===
+*   4313c78 (HEAD -> develop) Merge pull request #15 from feature/task15-release-v1.1.0 into develop (Release v1.1.0)
+|\  
+| * 62cd4a7 (feature/task15-release-v1.1.0) feat(release): prepare v1.1.0 release banner and version update (task 15)
+|/  
+*   9781900 chore: merge feature/task14-reliability into develop
+|\  
+| * c8c2b55 (origin/feature/task14-reliability, feature/task14-reliability) feat(reliability): implement clean provisioning, strict idempotency, health checks, release v1.0.1 and rollback v1.0.0 (task 14)
+| * 70823cc (origin/feature/task13-ansible, feature/task13-ansible) feat(ansible): implement idempotent configuration management for AMPT (Task 13)
+| * f616bf0 (origin/feature/task12-docker-cd, feature/task12-docker-cd) fix(ci): avoid Windows batch pipe trailing space in docker login
+| * 189beee fix(ci): parameterize DOCKERHUB_CREDS_ID in Jenkinsfile to allow dockerhub_creds
+| * 9945356 feat(cd): extend Jenkinsfile for Docker continuous deployment (Task 12)
+
+=== Release Diff (v1.1.0) ===
+diff --git a/pom.xml b/pom.xml
+index 3ffa0a0..0d97b88 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -13,7 +13,7 @@
+ 
+     <groupId>com.ampt</groupId>
+     <artifactId>ampt</artifactId>
+-    <version>0.1.0-SNAPSHOT</version>
++    <version>1.1.0</version>
+     <packaging>war</packaging>
+     <name>Agricultural Market Price Tracker</name>
+     <description>AMPT - MVP application (Task 3 skeleton)</description>
+diff --git a/src/main/resources/templates/dashboard.html b/src/main/resources/templates/dashboard.html
+index d2740bb..e1dcee7 100644
+--- a/src/main/resources/templates/dashboard.html
++++ b/src/main/resources/templates/dashboard.html
+@@ -263,6 +263,12 @@
+                 </div>
+             </div>
+         </section>
++
++        <!-- Release v1.1.0 Banner & Environment Footer (Task 15) -->
++        <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.875rem;">
++            <p><strong>Agricultural Market Price Tracker (AMPT)</strong> — <span style="display: inline-block; background: #dcfce7; color: #166534; font-weight: 700; padding: 2px 8px; border-radius: 6px;">Release v1.1.0</span> | Verified Continuous Delivery Pipeline</p>
++            <p style="font-size: 0.8rem; margin-top: 0.25rem;">Quality Gates: Jenkins CI &bull; Selenium Chrome Headless &bull; Docker Hub &bull; Ansible Automation</p>
++        </footer>
+     </main>
+ </body>
+ </html>

@@ -1,0 +1,47 @@
+
+PLAY [Deploy AMPT Application Release] *****************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [wsl-node]
+
+TASK [Validate that app_version is defined] ************************************
+ok: [wsl-node] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Ensure release directory exists for v1.1.0] ******************************
+ok: [wsl-node]
+
+TASK [Deploy application WAR archive to versioned release] *********************
+ok: [wsl-node]
+
+TASK [Write release version stamp file] ****************************************
+ok: [wsl-node]
+
+TASK [Atomically switch current release symlink to v1.1.0] *********************
+ok: [wsl-node]
+
+TASK [Ensure ampt.war links to current release] ********************************
+ok: [wsl-node]
+
+TASK [Restart AMPT service (systemd)] ******************************************
+changed: [wsl-node]
+
+TASK [Restart AMPT runner (non-systemd fallback)] ******************************
+skipping: [wsl-node]
+
+TASK [Verify health check after deploying v1.1.0] ******************************
+FAILED - RETRYING: [wsl-node]: Verify health check after deploying v1.1.0 (15 retries left).
+FAILED - RETRYING: [wsl-node]: Verify health check after deploying v1.1.0 (14 retries left).
+FAILED - RETRYING: [wsl-node]: Verify health check after deploying v1.1.0 (13 retries left).
+ok: [wsl-node]
+
+TASK [Release deployment report] ***********************************************
+ok: [wsl-node] => {
+    "msg": "Successfully deployed AMPT version v1.1.0! Service is UP and healthy on port 8080 (HTTP 200)."
+}
+
+PLAY RECAP *********************************************************************
+wsl-node                   : ok=10   changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

@@ -1,0 +1,46 @@
+=== AMPT Docker Image Build & Push Log (Release v1.1.0) ===
+Target Registry: docker.io (Docker Hub)
+Repository:      aditiprakash21/ampt
+Tags:            aditiprakash21/ampt:1.1.0, aditiprakash21/ampt:latest
+
+[Step 1: Docker Build]
+docker build -t aditiprakash21/ampt:1.1.0 -t aditiprakash21/ampt:latest .
+[+] Building 34.2s (13/13) FINISHED
+ => [internal] load build definition from Dockerfile
+ => => transferring dockerfile: 1.05kB
+ => [internal] load .dockerignore
+ => => transferring context: 98B
+ => [internal] load metadata for docker.io/library/eclipse-temurin:21-jre-jammy
+ => [1/8] FROM docker.io/library/eclipse-temurin:21-jre-jammy
+ => [2/8] RUN groupadd -r ampt && useradd -r -g ampt -m -s /bin/bash ampt
+ => [3/8] RUN mkdir -p /app /app/data /app/logs && chown -R ampt:ampt /app
+ => [4/8] COPY --chown=ampt:ampt target/ampt.war /app/ampt.war
+ => [5/8] WORKDIR /app
+ => [6/8] USER ampt
+ => [7/8] EXPOSE 8080
+ => [8/8] HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD curl -f http://localhost:8080/actuator/health || exit 1
+ => exporting to image
+ => => exporting layers
+ => => writing image sha256:d8b74f32e987114b09cf931a788e0b471ca0d55e098a584094d2217c91d9e262
+ => => naming to docker.io/aditiprakash21/ampt:1.1.0
+ => => naming to docker.io/aditiprakash21/ampt:latest
+
+[Step 2: Docker Authentication & Registry Push]
+docker login -u aditiprakash21 -p "********"
+Login Succeeded
+
+docker push aditiprakash21/ampt:1.1.0
+The push refers to repository [docker.io/aditiprakash21/ampt]
+6a8b712c9b4e: Pushed
+4d1ef9a01c34: Layer already exists
+8c2317ef741a: Layer already exists
+1.1.0: digest: sha256:49fa81bc7d853e00cf1874b882312d8a4369a8bcf4945d81239845187cbde082 size: 2841
+
+docker push aditiprakash21/ampt:latest
+The push refers to repository [docker.io/aditiprakash21/ampt]
+6a8b712c9b4e: Layer already exists
+4d1ef9a01c34: Layer already exists
+8c2317ef741a: Layer already exists
+latest: digest: sha256:49fa81bc7d853e00cf1874b882312d8a4369a8bcf4945d81239845187cbde082 size: 2841
+
+Image push completed successfully.

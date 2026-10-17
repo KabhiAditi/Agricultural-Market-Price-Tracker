@@ -1,0 +1,35 @@
+=== Maven Test Results Summary ===
+-------------------------------------------------------------------------------
+Test set: com.ampt.AmptApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.58 s -- in com.ampt.AmptApplicationTests
+-------------------------------------------------------------------------------
+Test set: com.ampt.controller.AlertControllerTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.768 s -- in com.ampt.controller.AlertControllerTest
+-------------------------------------------------------------------------------
+Test set: com.ampt.controller.AuthControllerTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.941 s -- in com.ampt.controller.AuthControllerTest
+-------------------------------------------------------------------------------
+Test set: com.ampt.controller.PriceRecordControllerTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.130 s -- in com.ampt.controller.PriceRecordControllerTest
+-------------------------------------------------------------------------------
+Test set: com.ampt.service.AlertServiceTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.375 s -- in com.ampt.service.AlertServiceTest
+-------------------------------------------------------------------------------
+Test set: com.ampt.service.PriceRecordServiceTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.156 s -- in com.ampt.service.PriceRecordServiceTest
+-------------------------------------------------------------------------------
+Test set: com.ampt.service.SummaryServiceTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.ampt.service.SummaryServiceTest
+
+=== Selenium Failsafe Acceptance Tests Summary ===
+-------------------------------------------------------------------------------
+Test set: com.ampt.ui.AmptJourneysIT
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 40.90 s -- in com.ampt.ui.AmptJourneysIT

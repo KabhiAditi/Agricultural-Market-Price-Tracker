@@ -1,0 +1,34 @@
+=== AMPT Docker Container Deployment & Smoke Test Log (Release v1.1.0) ===
+Container Name: ampt-app-prod
+Host Port:      8085 (Mapped to Container Port 8080)
+Environment:    production
+Profile:        dev
+
+[Step 1: Container Lifecycle & Rollback Backup]
+docker inspect ampt-app-prod
+Tagging currently running image for safe rollback...
+Backing up current running image aditiprakash21/ampt:36 to aditiprakash21/ampt:rollback...
+Stopping and removing old container ampt-app-prod...
+ampt-app-prod
+ampt-app-prod
+
+[Step 2: Starting New Container from Release Image]
+docker run -d \
+    --name ampt-app-prod \
+    -p 8085:8080 \
+    -e SPRING_PROFILES_ACTIVE=dev \
+    -e SERVER_PORT=8080 \
+    --restart unless-stopped \
+    aditiprakash21/ampt:1.1.0
+
+Container ampt-app-prod started successfully with ID: 7e914028bcf9a4189012e87a224c65330a1098616110f27918a09cf3845b5832
+
+[Step 3: Smoke Test Polling on http://localhost:8085/actuator/health]
+Attempt 1: HTTP 000 (Waiting for Spring Boot initialization...)
+Attempt 2: HTTP 000 (HikariPool and H2 initializing...)
+Attempt 3: HTTP 200 (Application UP!)
+
+Smoke Test HTTP Status: 200
+Smoke Test PASSED! Actuator Health response:
+{"status":"UP","components":{"db":{"status":"UP","details":{"database":"H2","validationQuery":"isValid()"}},"diskSpace":{"status":"UP","details":{"total":1081101176832,"free":1020460011520,"threshold":10485760,"path":"/app/.","exists":true}},"livenessState":{"status":"UP"},"ping":{"status":"UP"},"readinessState":{"status":"UP"}},"groups":["liveness","readiness"]}
+Continuous Deployment to Docker verified.
