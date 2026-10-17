@@ -91,8 +91,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: "${params.DOCKERHUB_CREDS_ID}", usernameVariable: 'DH_USER', passwordVariable: 'DH_TOKEN')]) {
                         bat """
                             @echo off
-                            echo Logging in to Docker Hub...
-                            echo %DH_TOKEN% | docker login -u %DH_USER% --password-stdin
+                            docker login -u %DH_USER% -p "%DH_TOKEN%"
                             if errorlevel 1 exit /b 1
                             echo Pushing build-tagged image...
                             docker push ${BUILD_TAG}
