@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.36
+    container_name: ampt-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: amptdb
+      MYSQL_USER: ampt
+      MYSQL_PASSWORD: amptpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ampt-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ampt", "-pamptpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  app:
+    image: ampt:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ampt-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      SERVER_PORT: 8080
+      DB_URL: jdbc:mysql://mysql:3306/amptdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: ampt
+      DB_PASSWORD: amptpassword
+    ports:
+      - "${APP_HOST_PORT:-8085}:8080"
+    networks:
+      - ampt-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  mysql_data:
+    name: ampt_mysql_data
+
+networks:
+  ampt-network:
+    name: ampt_network
+    driver: bridge

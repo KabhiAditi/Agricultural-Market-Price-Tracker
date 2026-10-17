@@ -1,0 +1,13 @@
+**/*.class
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.log
+docker/command-log.txt
+docs/
