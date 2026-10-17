@@ -1,0 +1,104 @@
+=== Running Ansible Syntax Check ===
+
+playbook: site.yml
+=== Executing Playbook on Target: wsl-node ===
+
+PLAY [Provision and Deploy Agricultural Market Price Tracker (AMPT)] ***********
+
+TASK [Gathering Facts] *********************************************************
+ok: [wsl-node]
+
+TASK [common : Update apt package cache (Debian / Ubuntu)] *********************
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/91976/Desktop/Assignments Semester 7/DevOps/DevOps Project/ansible/roles/common/tasks/main.yml:11:9
+
+ 9     update_cache: yes
+10     cache_valid_time: "{{ apt_cache_valid_time }}"
+11   when: ansible_pkg_mgr == 'apt'
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [wsl-node]
+
+TASK [common : Install required baseline packages] *****************************
+ok: [wsl-node]
+
+TASK [common : Ensure dedicated AMPT system group exists] **********************
+ok: [wsl-node]
+
+TASK [common : Ensure dedicated AMPT system user exists] ***********************
+ok: [wsl-node]
+
+TASK [ampt_app : Create AMPT filesystem directories] ***************************
+ok: [wsl-node] => (item={'path': '/opt/ampt', 'mode': '0750'})
+ok: [wsl-node] => (item={'path': '/opt/ampt/bin', 'mode': '0750'})
+ok: [wsl-node] => (item={'path': '/opt/ampt/data', 'mode': '0750'})
+ok: [wsl-node] => (item={'path': '/var/log/ampt', 'mode': '0755'})
+ok: [wsl-node] => (item={'path': '/etc/ampt', 'mode': '0750'})
+
+TASK [ampt_app : Deploy application.yml configuration template] ****************
+ok: [wsl-node]
+
+TASK [ampt_app : Deploy environment override configuration (ampt.env)] *********
+ok: [wsl-node]
+
+TASK [ampt_app : Deploy non-systemd process runner script] *********************
+ok: [wsl-node]
+
+TASK [ampt_app : Deploy AMPT application archive (ampt.war)] *******************
+ok: [wsl-node]
+
+TASK [ampt_app : Deploy systemd unit file (systemd nodes only)] ****************
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/91976/Desktop/Assignments Semester 7/DevOps/DevOps Project/ansible/roles/ampt_app/tasks/main.yml:74:9
+
+72     group: root
+73     mode: "0644"
+74   when: ansible_service_mgr == 'systemd'
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [wsl-node]
+
+TASK [ampt_app : Flush handlers before health validation] **********************
+
+TASK [ampt_app : Ensure AMPT service is started and enabled (systemd)] *********
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/91976/Desktop/Assignments Semester 7/DevOps/DevOps Project/ansible/roles/ampt_app/tasks/main.yml:88:9
+
+86     state: started
+87     enabled: true
+88   when: ansible_service_mgr == 'systemd'
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+ok: [wsl-node]
+
+TASK [ampt_app : Ensure AMPT process is started (non-systemd fallback)] ********
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated, top-level facts will not be auto injected after the change. This feature will be removed from ansible-core version 2.24.
+Origin: /mnt/c/Users/91976/Desktop/Assignments Semester 7/DevOps/DevOps Project/ansible/roles/ampt_app/tasks/main.yml:94:9
+
+92   ansible.builtin.command: "{{ ampt_home_dir }}/bin/ampt-runner.sh start"
+93   become_user: "{{ ampt_user }}"
+94   when: ansible_service_mgr != 'systemd'
+           ^ column 9
+
+Use `ansible_facts["fact_name"]` (no `ansible_` prefix) instead.
+
+skipping: [wsl-node]
+
+TASK [ampt_app : Wait for AMPT health check endpoint to respond with UP] *******
+ok: [wsl-node]
+
+TASK [ampt_app : Display health check response summary] ************************
+ok: [wsl-node] => {
+    "msg": "AMPT Application is UP and healthy on port 8080 (HTTP 200)"
+}
+
+PLAY RECAP *********************************************************************
+wsl-node                   : ok=14   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

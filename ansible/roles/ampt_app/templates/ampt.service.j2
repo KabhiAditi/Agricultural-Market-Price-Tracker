@@ -1,0 +1,23 @@
+[Unit]
+Description=Agricultural Market Price Tracker (AMPT)
+Documentation=https://github.com/KabhiAditi/Agricultural-Market-Price-Tracker
+After=network.target network-online.target syslog.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ ampt_user }}
+Group={{ ampt_group }}
+WorkingDirectory={{ ampt_home_dir }}
+EnvironmentFile=-{{ ampt_config_dir }}/ampt.env
+ExecStart=/usr/bin/java {{ ampt_java_opts }} -jar {{ ampt_artifact_dest }}
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+StandardOutput=append:{{ ampt_log_dir }}/ampt.log
+StandardError=append:{{ ampt_log_dir }}/ampt-error.log
+SuccessExitStatus=143
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+---
+# ==============================================================================
+# Tasks for role: common
+# Idempotent baseline provisioning: system packages, user, and group
+# ==============================================================================
+
+- name: Update apt package cache (Debian / Ubuntu)
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+  when: ansible_pkg_mgr == 'apt'
+  tags: [common, packages]
+
+- name: Install required baseline packages
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+  tags: [common, packages]
+
+- name: Ensure dedicated AMPT system group exists
+  ansible.builtin.group:
+    name: "{{ ampt_group }}"
+    system: true
+    state: present
+  tags: [common, user]
+
+- name: Ensure dedicated AMPT system user exists
+  ansible.builtin.user:
+    name: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    home: "{{ ampt_home_dir }}"
+    create_home: false
+    shell: /bin/bash
+    system: true
+    state: present
+  tags: [common, user]

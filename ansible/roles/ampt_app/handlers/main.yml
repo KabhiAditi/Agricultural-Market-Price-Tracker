@@ -1,0 +1,19 @@
+---
+# ==============================================================================
+# Handlers for ampt_app role
+# ==============================================================================
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: ansible_service_mgr == 'systemd'
+
+- name: Restart ampt service (systemd)
+  ansible.builtin.systemd:
+    name: "{{ ampt_service_name }}"
+    state: restarted
+  when: ansible_service_mgr == 'systemd'
+
+- name: Restart ampt runner (non-systemd)
+  ansible.builtin.command: "{{ ampt_home_dir }}/bin/ampt-runner.sh restart"
+  when: ansible_service_mgr != 'systemd'

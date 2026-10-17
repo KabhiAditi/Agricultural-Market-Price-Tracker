@@ -1,0 +1,33 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install SSH, Python, sudo, and baseline tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        openssh-server \
+        python3 \
+        python3-apt \
+        sudo \
+        curl \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create ampt user with password and passwordless sudo privileges
+RUN groupadd -r ampt && \
+    useradd -m -s /bin/bash -g ampt ampt && \
+    echo "ampt:ampt123" | chpasswd && \
+    echo "root:root123" | chpasswd && \
+    echo "ampt ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ampt && \
+    chmod 0440 /etc/sudoers.d/ampt
+
+# Prepare SSH runtime environment
+RUN mkdir -p /var/run/sshd && \
+    ssh-keygen -A && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+EXPOSE 22 8080
+
+CMD ["/usr/sbin/sshd", "-D"]

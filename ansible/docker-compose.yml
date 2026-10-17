@@ -1,0 +1,40 @@
+services:
+  target-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.target
+    container_name: ampt-target-node
+    hostname: target-node
+    ports:
+      - "2222:22"
+      - "8086:8080"
+    restart: unless-stopped
+    networks:
+      - ansible-net
+
+  control-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.control
+    container_name: ampt-control-node
+    volumes:
+      - .:/ansible
+      - ../target:/target:ro
+    depends_on:
+      - target-node
+    environment:
+      - ANSIBLE_CONFIG=/ansible/ansible.cfg
+    networks:
+      - ansible-net
+    command: >
+      bash -c "
+        echo '=== Waiting for Target Node SSH ===' &&
+        while ! nc -z target-node 22; do sleep 1; done &&
+        echo 'Target SSH is ready.' &&
+        ansible-playbook --syntax-check -i inventory.ini site.yml &&
+        ansible-playbook -i inventory.ini site.yml
+      "
+
+networks:
+  ansible-net:
+    driver: bridge

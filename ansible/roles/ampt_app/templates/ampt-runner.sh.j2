@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Managed by Ansible: AMPT Process Runner (Non-systemd environments)
+set -eo pipefail
+
+PIDFILE="{{ ampt_home_dir }}/ampt.pid"
+source {{ ampt_config_dir }}/ampt.env
+
+case "$1" in
+  start)
+    if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+      echo "AMPT is already running with PID $(cat "$PIDFILE")"
+      exit 0
+    fi
+    echo "Starting AMPT process..."
+    cd {{ ampt_home_dir }}
+    nohup /usr/bin/java $JAVA_OPTS -jar {{ ampt_artifact_dest }} >> {{ ampt_log_dir }}/ampt.log 2>&1 &
+    echo $! > "$PIDFILE"
+    echo "AMPT started with PID $(cat "$PIDFILE")"
+    ;;
+  stop)
+    if [ -f "$PIDFILE" ]; then
+      PID=$(cat "$PIDFILE")
+      echo "Stopping AMPT (PID $PID)..."
+      kill -15 "$PID" 2>/dev/null || true
+      rm -f "$PIDFILE"
+      echo "AMPT stopped."
+    else
+      echo "No PID file found. Checking pkill..."
+      pkill -f "ampt.war" || true
+    fi
+    ;;
+  restart)
+    $0 stop
+    sleep 2
+    $0 start
+    ;;
+  status)
+    if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+      echo "AMPT running with PID $(cat "$PIDFILE")"
+      exit 0
+    else
+      echo "AMPT not running"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac

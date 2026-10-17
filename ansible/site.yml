@@ -1,0 +1,15 @@
+---
+# ==============================================================================
+# Master Site Playbook for AMPT Configuration & Deployment
+# ==============================================================================
+
+- name: Provision and Deploy Agricultural Market Price Tracker (AMPT)
+  hosts: app_servers
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: common
+      tags: [common, base, packages, user]
+    - role: ampt_app
+      tags: [ampt, app, service, deploy]

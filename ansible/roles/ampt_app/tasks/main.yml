@@ -1,0 +1,112 @@
+---
+# ==============================================================================
+# Tasks for role: ampt_app
+# Idempotent directory creation, config deployment, artifact copy, service start, and health verification
+# ==============================================================================
+
+- name: Create AMPT filesystem directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: "{{ ampt_home_dir }}", mode: "0750" }
+    - { path: "{{ ampt_home_dir }}/bin", mode: "0750" }
+    - { path: "{{ ampt_data_dir }}", mode: "0750" }
+    - { path: "{{ ampt_log_dir }}", mode: "0755" }
+    - { path: "{{ ampt_config_dir }}", mode: "0750" }
+  tags: [ampt, directories]
+
+- name: Deploy application.yml configuration template
+  ansible.builtin.template:
+    src: application.yml.j2
+    dest: "{{ ampt_home_dir }}/application.yml"
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "0640"
+  notify:
+    - Restart ampt service (systemd)
+    - Restart ampt runner (non-systemd)
+  tags: [ampt, config]
+
+- name: Deploy environment override configuration (ampt.env)
+  ansible.builtin.template:
+    src: ampt.env.j2
+    dest: "{{ ampt_config_dir }}/ampt.env"
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "0600"
+  notify:
+    - Restart ampt service (systemd)
+    - Restart ampt runner (non-systemd)
+  tags: [ampt, config]
+
+- name: Deploy non-systemd process runner script
+  ansible.builtin.template:
+    src: ampt-runner.sh.j2
+    dest: "{{ ampt_home_dir }}/bin/ampt-runner.sh"
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "0755"
+  tags: [ampt, runner]
+
+- name: Deploy AMPT application archive (ampt.war)
+  ansible.builtin.copy:
+    src: "{{ ampt_artifact_src }}"
+    dest: "{{ ampt_artifact_dest }}"
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "0644"
+  notify:
+    - Restart ampt service (systemd)
+    - Restart ampt runner (non-systemd)
+  tags: [ampt, artifact]
+
+- name: Deploy systemd unit file (systemd nodes only)
+  ansible.builtin.template:
+    src: ampt.service.j2
+    dest: /etc/systemd/system/ampt.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_service_mgr == 'systemd'
+  notify:
+    - Reload systemd daemon
+    - Restart ampt service (systemd)
+  tags: [ampt, systemd]
+
+- name: Flush handlers before health validation
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure AMPT service is started and enabled (systemd)
+  ansible.builtin.systemd:
+    name: "{{ ampt_service_name }}"
+    state: started
+    enabled: true
+  when: ansible_service_mgr == 'systemd'
+  tags: [ampt, service]
+
+- name: Ensure AMPT process is started (non-systemd fallback)
+  ansible.builtin.command: "{{ ampt_home_dir }}/bin/ampt-runner.sh start"
+  become_user: "{{ ampt_user }}"
+  when: ansible_service_mgr != 'systemd'
+  tags: [ampt, service]
+
+- name: Wait for AMPT health check endpoint to respond with UP
+  ansible.builtin.uri:
+    url: "{{ ampt_health_url }}"
+    method: GET
+    status_code: 200
+    return_content: true
+  register: health_result
+  until: health_result.status == 200 and ('UP' in health_result.content or 'status' in health_result.json)
+  retries: "{{ ampt_health_retries }}"
+  delay: "{{ ampt_health_delay }}"
+  tags: [ampt, health]
+
+- name: Display health check response summary
+  ansible.builtin.debug:
+    msg: "AMPT Application is UP and healthy on port {{ ampt_port }} (HTTP {{ health_result.status }})"
+  tags: [ampt, health]

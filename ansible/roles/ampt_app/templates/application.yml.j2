@@ -1,0 +1,43 @@
+# ==============================================================================
+# Managed by Ansible: AMPT Application Configuration
+# Host: {{ inventory_hostname }} | Environment: {{ app_env }}
+# ==============================================================================
+
+server:
+  port: {{ ampt_port }}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: ampt
+  profiles:
+    active: {{ app_env }}
+  datasource:
+    url: jdbc:h2:file:{{ ampt_h2_path }};AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.ampt: INFO
+  file:
+    name: {{ ampt_log_dir }}/ampt.log

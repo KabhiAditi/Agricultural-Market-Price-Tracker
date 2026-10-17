@@ -1,0 +1,4 @@
+---
+# Defaults for common role
+update_apt_cache: true
+apt_cache_valid_time: 3600
