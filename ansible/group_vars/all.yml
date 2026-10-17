@@ -1,0 +1,43 @@
+---
+# ==============================================================================
+# Global Variables for AMPT Ansible Deployment
+# ==============================================================================
+
+# Application environment
+app_env: dev
+
+# System User & Group isolation
+ampt_user: ampt
+ampt_group: ampt
+
+# Filesystem layout
+ampt_home_dir: /opt/ampt
+ampt_releases_dir: /opt/ampt/releases
+ampt_current_dir: /opt/ampt/current
+ampt_data_dir: /opt/ampt/data
+ampt_log_dir: /var/log/ampt
+ampt_config_dir: /etc/ampt
+ampt_service_name: ampt
+
+# Network & service port
+ampt_port: 8080
+
+# JVM options
+ampt_java_opts: "-Xms256m -Xmx512m -Djava.security.egd=file:/dev/./urandom"
+
+# Application artifact paths
+ampt_artifact_src: "{{ playbook_dir }}/../target/ampt.war"
+ampt_artifact_dest: "{{ ampt_home_dir }}/ampt.war"
+
+# Baseline packages required by target node
+common_packages:
+  - curl
+  - ca-certificates
+  - tar
+  - gzip
+  - openjdk-21-jre-headless
+
+# Health check parameters
+ampt_health_url: "http://127.0.0.1:{{ ampt_port }}/actuator/health"
+ampt_health_retries: 15
+ampt_health_delay: 4

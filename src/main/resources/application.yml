@@ -52,3 +52,6 @@ spring:
     username: ${DB_USER:ampt}
     password: ${DB_PASSWORD:ampt}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never

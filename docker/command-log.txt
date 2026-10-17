@@ -1,0 +1,296 @@
+================================================================================
+AMPT DOCKER CONTAINER & LIFECYCLE COMMAND LOG (TASK 11)
+Date: 2026-10-17
+Platform: Docker Desktop 29.6.1 / WSL2 Linux x86_64
+================================================================================
+
+--------------------------------------------------------------------------------
+1. docker build -t ampt:1.0.0 .
+--------------------------------------------------------------------------------
+Command:
+$ docker build -t ampt:1.0.0 .
+
+Output:
+[+] Building 47.4s (20/20) FINISHED
+ => [internal] load build definition from Dockerfile
+ => => transferring dockerfile: 2.49kB done
+ => [internal] load metadata for docker.io/library/eclipse-temurin:21-jre
+ => [internal] load metadata for docker.io/library/maven:3.9-eclipse-temurin-21
+ => [internal] load .dockerignore
+ => => transferring context: 164B done
+ => [builder 1/6] FROM docker.io/library/maven:3.9-eclipse-temurin-21
+ => [stage-1 1/6] FROM docker.io/library/eclipse-temurin:21-jre
+ => [internal] load build context
+ => => transferring context: 181.97kB done
+ => [builder 2/6] WORKDIR /build
+ => [builder 3/6] COPY pom.xml .
+ => [builder 4/6] RUN mvn dependency:go-offline -B
+ => [builder 5/6] COPY src ./src
+ => [builder 6/6] RUN mvn clean package -DskipTests -B
+ => [stage-1 2/6] RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+ => [stage-1 3/6] RUN groupadd -r amptgroup && useradd -r -g amptgroup -m -d /home/amptuser amptuser
+ => [stage-1 4/6] WORKDIR /app
+ => [stage-1 5/6] COPY --from=builder /build/target/ampt.war /app/app.war
+ => [stage-1 6/6] RUN mkdir -p /app/data && chown -R amptuser:amptgroup /app
+ => exporting to image
+ => => exporting layers done
+ => => writing image sha256:47b413800d94782d8c2ba5254a64310c4542d1d4460f4cbb34d7813bb02ad2c2 done
+ => => naming to docker.io/library/ampt:1.0.0 done
+
+--------------------------------------------------------------------------------
+2. docker images
+--------------------------------------------------------------------------------
+Command:
+$ docker images
+
+Output:
+IMAGE                                     ID             DISK USAGE   CONTENT SIZE   EXTRA
+ampt:1.0.0                                47b413800d94        681MB          219MB        
+mysql:8.0.36                              a53272402242        564MB          151MB        
+eclipse-temurin:21-jre                    227118764ccc        438MB          116MB        
+maven:3.9-eclipse-temurin-21              99e61abcff91        812MB          265MB        
+
+--------------------------------------------------------------------------------
+3. docker run -d --name ampt -p 8085:8080 ampt:1.0.0
+--------------------------------------------------------------------------------
+Command:
+$ docker run -d --name ampt -p 8085:8080 ampt:1.0.0
+
+Output:
+a63e73f7a1a522be3327fe3a972b0aaa645bf77a7bf9cfc7339c6dac01652f1e
+
+--------------------------------------------------------------------------------
+4. docker ps
+--------------------------------------------------------------------------------
+Command:
+$ docker ps
+
+Output:
+CONTAINER ID   IMAGE        COMMAND                  CREATED          STATUS                        PORTS                                         NAMES
+a63e73f7a1a5   ampt:1.0.0   "sh -c 'exec java $J…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:8085->8080/tcp, [::]:8085->8080/tcp   ampt
+
+--------------------------------------------------------------------------------
+5. docker logs ampt
+--------------------------------------------------------------------------------
+Command:
+$ docker logs ampt
+
+Output:
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-10-16T14:56:31.481Z  INFO 1 --- [ampt] [           main] com.ampt.AmptApplication                 : Starting AmptApplication v0.1.0-SNAPSHOT using Java 21.0.12.1 with PID 1 (/app/app.war started by amptuser in /app)
+2026-10-16T14:56:31.487Z  INFO 1 --- [ampt] [           main] com.ampt.AmptApplication                 : The following 1 profile is active: "local"
+2026-10-16T14:56:33.297Z  INFO 1 --- [ampt] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-16T14:56:33.410Z  INFO 1 --- [ampt] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 101 ms. Found 4 JPA repository interfaces.
+2026-10-16T14:56:35.033Z  INFO 1 --- [ampt] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-16T14:56:35.067Z  INFO 1 --- [ampt] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-16T14:56:35.067Z  INFO 1 --- [ampt] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-10-16T14:56:35.178Z  INFO 1 --- [ampt] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-16T14:56:35.180Z  INFO 1 --- [ampt] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3595 ms
+2026-10-16T14:56:35.406Z  INFO 1 --- [ampt] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-16T14:56:35.762Z  INFO 1 --- [ampt] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:file:./data/amptdb user=SA
+2026-10-16T14:56:35.764Z  INFO 1 --- [ampt] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-16T14:56:35.776Z  INFO 1 --- [ampt] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/amptdb'
+2026-10-16T14:56:36.010Z  INFO 1 --- [ampt] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-16T14:56:36.105Z  INFO 1 --- [ampt] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-10-16T14:56:36.157Z  INFO 1 --- [ampt] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-16T14:56:36.564Z  INFO 1 --- [ampt] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-16T14:56:37.845Z  INFO 1 --- [ampt] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-16T14:56:37.984Z  INFO 1 --- [ampt] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-16T14:56:39.723Z  INFO 1 --- [ampt] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-10-16T14:56:39.843Z  INFO 1 --- [ampt] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-10-16T14:56:39.860Z  INFO 1 --- [ampt] [           main] com.ampt.AmptApplication                 : Started AmptApplication in 9.183 seconds (process running for 10.629)
+2026-10-16T14:56:40.778Z  INFO 1 --- [ampt] [           main] com.ampt.config.DataInitializer          : Seeded user 'entry' with role ENTRY_USER
+2026-10-16T14:56:40.939Z  INFO 1 --- [ampt] [           main] com.ampt.config.DataInitializer          : Seeded user 'viewer' with role VIEWER
+2026-10-16T14:56:41.880Z  INFO 1 --- [ampt] [           main] com.ampt.config.DataInitializer          : Successfully seeded 126 realistic price records across 14 days
+2026-10-16T14:56:44.625Z  INFO 1 --- [ampt] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-16T14:56:44.625Z  INFO 1 --- [ampt] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-16T14:56:44.626Z  INFO 1 --- [ampt] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+
+--------------------------------------------------------------------------------
+6. docker exec
+--------------------------------------------------------------------------------
+Command:
+$ docker exec ampt whoami
+amptuser
+
+$ docker exec ampt id
+uid=999(amptuser) gid=999(amptgroup) groups=999(amptgroup)
+
+$ docker exec ampt curl -s http://localhost:8080/actuator/health
+{"status":"UP"}
+
+--------------------------------------------------------------------------------
+7. docker inspect (trimmed)
+--------------------------------------------------------------------------------
+Command:
+$ docker inspect ampt
+
+Output (trimmed key fields):
+[
+    {
+        "Id": "a63e73f7a1a522be3327fe3a972b0aaa645bf77a7bf9cfc7339c6dac01652f1e",
+        "Created": "2026-10-16T14:56:29.8406183Z",
+        "Path": "sh",
+        "Args": [
+            "-c",
+            "exec java $JAVA_OPTS -jar /app/app.war"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Health": {
+                "Status": "healthy",
+                "FailingStreak": 0,
+                "Log": [
+                    {
+                        "Start": "2026-10-16T14:57:04.281Z",
+                        "End": "2026-10-16T14:57:04.629Z",
+                        "ExitCode": 0,
+                        "Output": "{\"status\":\"UP\"}"
+                    }
+                ]
+            }
+        },
+        "Config": {
+            "User": "amptuser:amptgroup",
+            "ExposedPorts": {
+                "8080/tcp": {}
+            },
+            "Env": [
+                "SERVER_PORT=8080",
+                "SPRING_PROFILES_ACTIVE=local",
+                "JAVA_OPTS=-Xms256m -Xmx512m -XX:+UseG1GC"
+            ],
+            "Healthcheck": {
+                "Test": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:8080/actuator/health || exit 1"
+                ],
+                "Interval": 30000000000,
+                "Timeout": 5000000000,
+                "StartPeriod": 30000000000,
+                "Retries": 3
+            },
+            "Image": "ampt:1.0.0"
+        },
+        "NetworkSettings": {
+            "Ports": {
+                "8080/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "8085"
+                    }
+                ]
+            },
+            "IPAddress": "172.17.0.2"
+        }
+    }
+]
+
+--------------------------------------------------------------------------------
+8. Container Lifecycle: docker stop / start / restart / rm
+--------------------------------------------------------------------------------
+Command:
+$ docker stop ampt
+ampt
+
+$ docker ps -a --filter "name=ampt"
+CONTAINER ID   IMAGE        COMMAND                  CREATED          STATUS                        PORTS     NAMES
+a63e73f7a1a5   ampt:1.0.0   "sh -c 'exec java $J…"   2 minutes ago    Exited (143) 1 second ago               ampt
+
+$ docker start ampt
+ampt
+
+$ docker ps --filter "name=ampt"
+CONTAINER ID   IMAGE        COMMAND                  CREATED          STATUS                                     PORTS                                         NAMES
+a63e73f7a1a5   ampt:1.0.0   "sh -c 'exec java $J…"   2 minutes ago    Up Less than a second (health: starting)   0.0.0.0:8085->8080/tcp, [::]:8085->8080/tcp   ampt
+
+$ docker restart ampt
+ampt
+
+$ docker ps --filter "name=ampt"
+CONTAINER ID   IMAGE        COMMAND                  CREATED          STATUS                                     PORTS                                         NAMES
+a63e73f7a1a5   ampt:1.0.0   "sh -c 'exec java $J…"   2 minutes ago    Up Less than a second (health: starting)   0.0.0.0:8085->8080/tcp, [::]:8085->8080/tcp   ampt
+
+$ docker stop ampt
+ampt
+
+$ docker rm ampt
+ampt
+
+$ docker ps -a --filter "name=ampt"
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+--------------------------------------------------------------------------------
+9. Image Lifecycle: docker rmi
+--------------------------------------------------------------------------------
+Command:
+$ docker tag ampt:1.0.0 ampt:test-tag
+$ docker images | Select-String "ampt"
+ampt:1.0.0                                47b413800d94        681MB          219MB        
+ampt:test-tag                             47b413800d94        681MB          219MB        
+
+$ docker rmi ampt:test-tag
+Untagged: ampt:test-tag
+
+$ docker images | Select-String "ampt"
+ampt:1.0.0                                47b413800d94        681MB          219MB        
+
+--------------------------------------------------------------------------------
+10. docker compose up -d / docker compose ps / docker compose down
+--------------------------------------------------------------------------------
+Command:
+$ docker compose up -d
+
+Output:
+ Network ampt_network Created 
+ Volume ampt_mysql_data Created 
+ Container ampt-mysql Created 
+ Container ampt-app Created 
+ Container ampt-mysql Starting 
+ Container ampt-mysql Started 
+ Container ampt-mysql Waiting 
+ Container ampt-mysql Healthy 
+ Container ampt-app Starting 
+ Container ampt-app Started 
+
+Command:
+$ docker compose ps
+
+Output:
+NAME         IMAGE          COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+ampt-app     ampt:1.0.0     "sh -c 'exec java $J…"   app       About a minute ago   Up About a minute (healthy)   0.0.0.0:8085->8080/tcp, [::]:8085->8080/tcp
+ampt-mysql   mysql:8.0.36   "docker-entrypoint.s…"   mysql     About a minute ago   Up About a minute (healthy)   0.0.0.0:3307->3306/tcp, [::]:3307->3306/tcp
+
+Health verification:
+$ curl.exe -i http://localhost:8085/actuator/health
+HTTP/1.1 200 
+Content-Type: application/vnd.spring-boot.actuator.v3+json
+Transfer-Encoding: chunked
+Date: Sat, 17 Oct 2026 06:48:55 GMT
+
+{"status":"UP"}
+
+Command:
+$ docker compose down
+
+Output:
+ Container ampt-app Stopping 
+ Container ampt-app Stopped 
+ Container ampt-app Removing 
+ Container ampt-app Removed 
+ Container ampt-mysql Stopping 
+ Container ampt-mysql Stopped 
+ Container ampt-mysql Removing 
+ Container ampt-mysql Removed 
+ Network ampt_network Removing 
+ Network ampt_network Removed 
+================================================================================

@@ -1,0 +1,84 @@
+
+PLAY [Provision and Deploy Agricultural Market Price Tracker (AMPT)] ***********
+
+TASK [Gathering Facts] *********************************************************
+ok: [wsl-node]
+
+TASK [common : Update apt package cache (Debian / Ubuntu)] *********************
+ok: [wsl-node]
+
+TASK [common : Install required baseline packages] *****************************
+ok: [wsl-node]
+
+TASK [common : Ensure dedicated AMPT system group exists] **********************
+changed: [wsl-node]
+
+TASK [common : Ensure dedicated AMPT system user exists] ***********************
+changed: [wsl-node]
+
+TASK [ampt_app : Create AMPT filesystem directories] ***************************
+changed: [wsl-node] => (item={'path': '/opt/ampt', 'mode': '0750'})
+changed: [wsl-node] => (item={'path': '/opt/ampt/bin', 'mode': '0750'})
+changed: [wsl-node] => (item={'path': '/opt/ampt/releases', 'mode': '0750'})
+changed: [wsl-node] => (item={'path': '/opt/ampt/data', 'mode': '0750'})
+changed: [wsl-node] => (item={'path': '/var/log/ampt', 'mode': '0755'})
+changed: [wsl-node] => (item={'path': '/etc/ampt', 'mode': '0750'})
+
+TASK [ampt_app : Deploy application.yml configuration template] ****************
+changed: [wsl-node]
+
+TASK [ampt_app : Deploy environment override configuration (ampt.env)] *********
+changed: [wsl-node]
+
+TASK [ampt_app : Deploy non-systemd process runner script] *********************
+changed: [wsl-node]
+
+TASK [ampt_app : Ensure versioned release directory exists] ********************
+changed: [wsl-node]
+
+TASK [ampt_app : Deploy AMPT application archive to release directory] *********
+changed: [wsl-node]
+
+TASK [ampt_app : Write release version stamp] **********************************
+changed: [wsl-node]
+
+TASK [ampt_app : Update current release symlink] *******************************
+changed: [wsl-node]
+
+TASK [ampt_app : Link application binary to current release] *******************
+changed: [wsl-node]
+
+TASK [ampt_app : Deploy systemd unit file (systemd nodes only)] ****************
+changed: [wsl-node]
+
+TASK [ampt_app : Flush handlers before health validation] **********************
+
+RUNNING HANDLER [ampt_app : Reload systemd daemon] *****************************
+ok: [wsl-node]
+
+RUNNING HANDLER [ampt_app : Restart ampt service (systemd)] ********************
+changed: [wsl-node]
+
+RUNNING HANDLER [ampt_app : Restart ampt runner (non-systemd)] *****************
+skipping: [wsl-node]
+
+TASK [ampt_app : Ensure AMPT service is started and enabled (systemd)] *********
+changed: [wsl-node]
+
+TASK [ampt_app : Ensure AMPT process is started (non-systemd fallback)] ********
+skipping: [wsl-node]
+
+TASK [ampt_app : Wait for AMPT health check endpoint to respond with UP] *******
+FAILED - RETRYING: [wsl-node]: Wait for AMPT health check endpoint to respond with UP (15 retries left).
+FAILED - RETRYING: [wsl-node]: Wait for AMPT health check endpoint to respond with UP (14 retries left).
+FAILED - RETRYING: [wsl-node]: Wait for AMPT health check endpoint to respond with UP (13 retries left).
+ok: [wsl-node]
+
+TASK [ampt_app : Display health check response summary] ************************
+ok: [wsl-node] => {
+    "msg": "AMPT Application is UP and healthy on port 8080 (HTTP 200)"
+}
+
+PLAY RECAP *********************************************************************
+wsl-node                   : ok=20   changed=14   unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+

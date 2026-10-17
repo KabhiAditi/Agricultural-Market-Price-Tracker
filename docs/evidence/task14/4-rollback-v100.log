@@ -1,0 +1,58 @@
+
+PLAY [Rollback AMPT Application to Previous Stable Release] ********************
+
+TASK [Gathering Facts] *********************************************************
+ok: [wsl-node]
+
+TASK [Validate that previous_version is specified] *****************************
+ok: [wsl-node] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Verify that the target rollback release directory exists] ****************
+ok: [wsl-node]
+
+TASK [Fail if target rollback version does not exist on node] ******************
+skipping: [wsl-node]
+
+TASK [Verify that the target release contains ampt.war] ************************
+ok: [wsl-node]
+
+TASK [Fail if target release WAR is missing] ***********************************
+skipping: [wsl-node]
+
+TASK [Read current version before rollback] ************************************
+ok: [wsl-node]
+
+TASK [Display current vs rollback target version] ******************************
+ok: [wsl-node] => {
+    "msg": "Initiating rollback from version v1.0.1 to v1.0.0..."
+}
+
+TASK [Atomically switch current release symlink to v1.0.0] *********************
+changed: [wsl-node]
+
+TASK [Ensure ampt.war symlink points to v1.0.0] ********************************
+ok: [wsl-node]
+
+TASK [Restart AMPT service (systemd)] ******************************************
+changed: [wsl-node]
+
+TASK [Restart AMPT runner (non-systemd fallback)] ******************************
+skipping: [wsl-node]
+
+TASK [Verify health check after rollback to v1.0.0] ****************************
+FAILED - RETRYING: [wsl-node]: Verify health check after rollback to v1.0.0 (15 retries left).
+FAILED - RETRYING: [wsl-node]: Verify health check after rollback to v1.0.0 (14 retries left).
+FAILED - RETRYING: [wsl-node]: Verify health check after rollback to v1.0.0 (13 retries left).
+ok: [wsl-node]
+
+TASK [Rollback completion report] **********************************************
+ok: [wsl-node] => {
+    "msg": "Rollback SUCCESSFUL! AMPT application is now running v1.0.0 and healthy on port 8080 (HTTP 200)."
+}
+
+PLAY RECAP *********************************************************************
+wsl-node                   : ok=11   changed=2    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+
