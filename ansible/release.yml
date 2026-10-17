@@ -1,0 +1,90 @@
+---
+# ==============================================================================
+# Playbook: release.yml
+# Deploys a new version of the AMPT application to the target nodes
+# Usage:
+#   ansible-playbook -i inventory.ini release.yml -e app_version=v1.0.1
+# ==============================================================================
+
+- name: Deploy AMPT Application Release
+  hosts: app_servers
+  become: true
+  gather_facts: true
+
+  vars:
+    app_version: "{{ app_version | default('v1.0.1') }}"
+
+  tasks:
+    - name: Validate that app_version is defined
+      ansible.builtin.assert:
+        that:
+          - app_version is defined
+          - app_version | length > 0
+        fail_msg: "Please specify an app_version (e.g. -e app_version=v1.0.1)"
+
+    - name: Ensure release directory exists for {{ app_version }}
+      ansible.builtin.file:
+        path: "{{ ampt_releases_dir }}/{{ app_version }}"
+        state: directory
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        mode: "0750"
+
+    - name: Deploy application WAR archive to versioned release
+      ansible.builtin.copy:
+        src: "{{ ampt_artifact_src }}"
+        dest: "{{ ampt_releases_dir }}/{{ app_version }}/ampt.war"
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        mode: "0644"
+
+    - name: Write release version stamp file
+      ansible.builtin.copy:
+        content: "{{ app_version }}\n"
+        dest: "{{ ampt_releases_dir }}/{{ app_version }}/version.txt"
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        mode: "0644"
+
+    - name: Atomically switch current release symlink to {{ app_version }}
+      ansible.builtin.file:
+        src: "{{ ampt_releases_dir }}/{{ app_version }}"
+        dest: "{{ ampt_current_dir }}"
+        state: link
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        force: true
+
+    - name: Ensure ampt.war links to current release
+      ansible.builtin.file:
+        src: "{{ ampt_current_dir }}/ampt.war"
+        dest: "{{ ampt_artifact_dest }}"
+        state: link
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        force: true
+
+    - name: Restart AMPT service (systemd)
+      ansible.builtin.systemd:
+        name: "{{ ampt_service_name }}"
+        state: restarted
+      when: ansible_service_mgr == 'systemd'
+
+    - name: Restart AMPT runner (non-systemd fallback)
+      ansible.builtin.command: "{{ ampt_home_dir }}/bin/ampt-runner.sh restart"
+      when: ansible_service_mgr != 'systemd'
+
+    - name: Verify health check after deploying {{ app_version }}
+      ansible.builtin.uri:
+        url: "{{ ampt_health_url }}"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: release_health
+      until: release_health.status == 200 and ('UP' in release_health.content or 'status' in release_health.json)
+      retries: "{{ ampt_health_retries }}"
+      delay: "{{ ampt_health_delay }}"
+
+    - name: Release deployment report
+      ansible.builtin.debug:
+        msg: "Successfully deployed AMPT version {{ app_version }}! Service is UP and healthy on port {{ ampt_port }} (HTTP {{ release_health.status }})."

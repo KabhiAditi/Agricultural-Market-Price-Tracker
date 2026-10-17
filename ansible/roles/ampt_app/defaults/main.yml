@@ -11,9 +11,18 @@ ampt_service_restart_on_change: true
 ampt_db_type: h2
 ampt_h2_path: "{{ ampt_data_dir }}/amptdb"
 
+# Release & Version Management
+app_version: "v1.0.0"
+ampt_releases_dir: "{{ ampt_home_dir }}/releases"
+ampt_current_dir: "{{ ampt_home_dir }}/current"
+
 # System directories to manage
 ampt_directories:
   - path: "{{ ampt_home_dir }}"
+    mode: "0750"
+  - path: "{{ ampt_home_dir }}/bin"
+    mode: "0750"
+  - path: "{{ ampt_releases_dir }}"
     mode: "0750"
   - path: "{{ ampt_data_dir }}"
     mode: "0750"

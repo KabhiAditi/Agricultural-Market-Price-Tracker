@@ -1,0 +1,8 @@
+[0;34m======================================================[0m
+[0;34m  AMPT Health Check Monitor[0m
+[0;34m  Target:  http://127.0.0.1:8080/actuator/health[0m
+[0;34m  Retries: 20 (Delay: 2s)[0m
+[0;34m======================================================[0m
+Attempt 1/20: Checking endpoint... [0;32m[UP] HTTP 200[0m
+[0;32mResponse Payload: {"status":"UP","components":{"db":{"status":"UP","details":{"database":"H2","validationQuery":"isValid()"}},"diskSpace":{"status":"UP","details":{"total":1081101176832,"free":1020638986240,"threshold":10485760,"path":"/opt/ampt/.","exists":true}},"livenessState":{"status":"UP"},"ping":{"status":"UP"},"readinessState":{"status":"UP"}},"groups":["liveness","readiness"]}[0m
+[0;32m>>> Health Check PASSED: AMPT Application is healthy![0m

@@ -1,0 +1,96 @@
+---
+# ==============================================================================
+# Playbook: rollback.yml
+# Rolls back the AMPT application to a previously verified stable release
+# Usage:
+#   ansible-playbook -i inventory.ini rollback.yml -e previous_version=v1.0.0
+# ==============================================================================
+
+- name: Rollback AMPT Application to Previous Stable Release
+  hosts: app_servers
+  become: true
+  gather_facts: true
+
+  vars:
+    previous_version: "{{ previous_version | default('v1.0.0') }}"
+
+  tasks:
+    - name: Validate that previous_version is specified
+      ansible.builtin.assert:
+        that:
+          - previous_version is defined
+          - previous_version | length > 0
+        fail_msg: "Please specify previous_version to rollback to (e.g. -e previous_version=v1.0.0)"
+
+    - name: Verify that the target rollback release directory exists
+      ansible.builtin.stat:
+        path: "{{ ampt_releases_dir }}/{{ previous_version }}"
+      register: target_release_stat
+
+    - name: Fail if target rollback version does not exist on node
+      ansible.builtin.fail:
+        msg: "Cannot rollback! Release {{ previous_version }} not found in {{ ampt_releases_dir }}"
+      when: not target_release_stat.stat.exists or not target_release_stat.stat.isdir
+
+    - name: Verify that the target release contains ampt.war
+      ansible.builtin.stat:
+        path: "{{ ampt_releases_dir }}/{{ previous_version }}/ampt.war"
+      register: target_war_stat
+
+    - name: Fail if target release WAR is missing
+      ansible.builtin.fail:
+        msg: "Cannot rollback! {{ ampt_releases_dir }}/{{ previous_version }}/ampt.war is missing"
+      when: not target_war_stat.stat.exists
+
+    - name: Read current version before rollback
+      ansible.builtin.slurp:
+        src: "{{ ampt_current_dir }}/version.txt"
+      register: current_version_slurp
+      ignore_errors: true
+
+    - name: Display current vs rollback target version
+      ansible.builtin.debug:
+        msg: "Initiating rollback from version {{ (current_version_slurp.content | b64decode | trim) if (current_version_slurp is success) else 'unknown' }} to {{ previous_version }}..."
+
+    - name: Atomically switch current release symlink to {{ previous_version }}
+      ansible.builtin.file:
+        src: "{{ ampt_releases_dir }}/{{ previous_version }}"
+        dest: "{{ ampt_current_dir }}"
+        state: link
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        force: true
+
+    - name: Ensure ampt.war symlink points to {{ previous_version }}
+      ansible.builtin.file:
+        src: "{{ ampt_current_dir }}/ampt.war"
+        dest: "{{ ampt_artifact_dest }}"
+        state: link
+        owner: "{{ ampt_user }}"
+        group: "{{ ampt_group }}"
+        force: true
+
+    - name: Restart AMPT service (systemd)
+      ansible.builtin.systemd:
+        name: "{{ ampt_service_name }}"
+        state: restarted
+      when: ansible_service_mgr == 'systemd'
+
+    - name: Restart AMPT runner (non-systemd fallback)
+      ansible.builtin.command: "{{ ampt_home_dir }}/bin/ampt-runner.sh restart"
+      when: ansible_service_mgr != 'systemd'
+
+    - name: Verify health check after rollback to {{ previous_version }}
+      ansible.builtin.uri:
+        url: "{{ ampt_health_url }}"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: rollback_health
+      until: rollback_health.status == 200 and ('UP' in rollback_health.content or 'status' in rollback_health.json)
+      retries: "{{ ampt_health_retries }}"
+      delay: "{{ ampt_health_delay }}"
+
+    - name: Rollback completion report
+      ansible.builtin.debug:
+        msg: "Rollback SUCCESSFUL! AMPT application is now running {{ previous_version }} and healthy on port {{ ampt_port }} (HTTP {{ rollback_health.status }})."

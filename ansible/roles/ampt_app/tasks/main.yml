@@ -14,6 +14,7 @@
   loop:
     - { path: "{{ ampt_home_dir }}", mode: "0750" }
     - { path: "{{ ampt_home_dir }}/bin", mode: "0750" }
+    - { path: "{{ ampt_releases_dir }}", mode: "0750" }
     - { path: "{{ ampt_data_dir }}", mode: "0750" }
     - { path: "{{ ampt_log_dir }}", mode: "0755" }
     - { path: "{{ ampt_config_dir }}", mode: "0750" }
@@ -52,17 +53,61 @@
     mode: "0755"
   tags: [ampt, runner]
 
-- name: Deploy AMPT application archive (ampt.war)
+- name: Ensure versioned release directory exists
+  ansible.builtin.file:
+    path: "{{ ampt_releases_dir }}/{{ app_version }}"
+    state: directory
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "0750"
+  tags: [ampt, artifact, release]
+
+- name: Deploy AMPT application archive to release directory
   ansible.builtin.copy:
     src: "{{ ampt_artifact_src }}"
-    dest: "{{ ampt_artifact_dest }}"
+    dest: "{{ ampt_releases_dir }}/{{ app_version }}/ampt.war"
     owner: "{{ ampt_user }}"
     group: "{{ ampt_group }}"
     mode: "0644"
   notify:
     - Restart ampt service (systemd)
     - Restart ampt runner (non-systemd)
-  tags: [ampt, artifact]
+  tags: [ampt, artifact, release]
+
+- name: Write release version stamp
+  ansible.builtin.copy:
+    content: "{{ app_version }}\n"
+    dest: "{{ ampt_releases_dir }}/{{ app_version }}/version.txt"
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    mode: "0644"
+  tags: [ampt, release]
+
+- name: Update current release symlink
+  ansible.builtin.file:
+    src: "{{ ampt_releases_dir }}/{{ app_version }}"
+    dest: "{{ ampt_current_dir }}"
+    state: link
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    force: true
+  notify:
+    - Restart ampt service (systemd)
+    - Restart ampt runner (non-systemd)
+  tags: [ampt, release]
+
+- name: Link application binary to current release
+  ansible.builtin.file:
+    src: "{{ ampt_current_dir }}/ampt.war"
+    dest: "{{ ampt_artifact_dest }}"
+    state: link
+    owner: "{{ ampt_user }}"
+    group: "{{ ampt_group }}"
+    force: true
+  notify:
+    - Restart ampt service (systemd)
+    - Restart ampt runner (non-systemd)
+  tags: [ampt, release]
 
 - name: Deploy systemd unit file (systemd nodes only)
   ansible.builtin.template:
@@ -91,6 +136,8 @@
 - name: Ensure AMPT process is started (non-systemd fallback)
   ansible.builtin.command: "{{ ampt_home_dir }}/bin/ampt-runner.sh start"
   become_user: "{{ ampt_user }}"
+  register: ampt_runner_start
+  changed_when: "'Starting AMPT process' in ampt_runner_start.stdout"
   when: ansible_service_mgr != 'systemd'
   tags: [ampt, service]
 
