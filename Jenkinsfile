@@ -9,6 +9,7 @@ pipeline {
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['dev', 'test', 'prod'], description: 'Target deployment environment (local/dev/prod profiles)')
         string(name: 'DOCKERHUB_USER', defaultValue: 'aditiprakash21', description: 'Docker Hub Username / Registry Namespace')
+        string(name: 'DOCKERHUB_CREDS_ID', defaultValue: 'dockerhub_creds', description: 'Jenkins Credentials ID for Docker Hub')
         string(name: 'IMAGE_NAME', defaultValue: 'ampt', description: 'Docker Repository Name')
         string(name: 'CONTAINER_PORT', defaultValue: '8085', description: 'Host port to map container 8080')
         choice(name: 'DEPLOY_MODE', choices: ['docker', 'tomcat'], description: 'Deployment Target: Docker Container (Task 12) or External Tomcat (Task 8)')
@@ -87,7 +88,7 @@ pipeline {
                 script {
                     echo "Logging into registry and pushing ${BUILD_TAG} & ${LATEST_TAG}..."
                     // Uses Jenkins credential 'dockerhub-creds' (Username with password / Access Token)
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_TOKEN')]) {
+                    withCredentials([usernamePassword(credentialsId: "${params.DOCKERHUB_CREDS_ID}", usernameVariable: 'DH_USER', passwordVariable: 'DH_TOKEN')]) {
                         bat """
                             @echo off
                             echo Logging in to Docker Hub...
